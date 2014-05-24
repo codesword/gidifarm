@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html ng-app="ionicApp">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+
+    <title>Gidifarm</title>
+
+    <link href="css/ionic.min.css" rel="stylesheet">
+    <link href="css/index.css" rel="stylesheet">
+
+    <script src="js/ionic.bundle.min.js"></script>
+    <script src="js/shoppingCart.js"></script>
+    <script src="js/app.js"></script>
+    <style>
+        body {
+
+        }
+        .box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .box-home {
+            padding-top: 75%;
+        }
+        .box-wrap {
+              padding-top: 40%;
+          }
+        .box-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            text-align: center;
+        }
+        .vertical-center-content {
+            text-align: center;
+            position: relative;
+            top: 50%;
+            -ms-transform: translateY(-50%);
+            -wekbit-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+
+        .outerContainer {
+            display: table;
+            width: 100px; /* width of parent */
+            height: 100px; /* height of parent */
+            overflow: hidden;
+        }
+        .center-content {
+            display: table-cell;
+            vertical-align: middle;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .list > a, a, input, label, div {
+            text-transform: none;
+        }
+
+        .right {
+            float: right;
+        }
+        .left {
+            float: left;
+        }
+
+
+    </style>
+
+</head>
+
+<body ng-controller="ToggleCtrl">
+<!--
+<ion-nav-bar class="bar-positive nav-title-slide-ios7">
+    <ion-nav-back-button class="button-icon ion-ios7-arrow-back">
+    </ion-nav-back-button>
+</ion-nav-bar>-->
+
+<ion-nav-view animation="slide-left-right">
+</ion-nav-view>
+
+
+<script id="sign-in.html" type="text/ng-template">
+    <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+    <ion-view title="Sign-In">
+        <ion-content padding="true">
+                    <div class="list col-center">
+                        <label class="item item-input">
+                            <span class="input-label">Username</span>
+                            <input type="text" ng-model="user.username">
+                        </label>
+                        <label class="item item-input">
+                            <span class="input-label">Password</span>
+                            <input type="password" ng-model="user.password">
+                        </label>
+                    </div>
+                    <div>
+                        <button class="button button-block button-positive" ng-click="signIn(user)">
+                            Sign-In
+                        </button>
+                        <p class="text-center">
+                            <a href="#/forgot-password">Forgot password</a> Or Register <a href="#/register">Here</a>
+                        </p>
+                    </div>
+
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="forgot-password.html" type="text/ng-template">
+    <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+    <ion-view title="Forgot Password">
+        <ion-content padding="true">
+            <p>
+                Yeah this is just a demo showing how views can be shown without tabs, then you can navigate
+                to views within tabs. Additionally, only one set of tabs needs to be written for all of the different views that should go inside the tabs. (Compared to written the same tab links in the footer of every view that's in a tab.)
+            </p>
+            <p>
+                There's no username/password, just click
+                the Sign-In button back a the sign-in view.
+            </p>
+            <p>
+                Return to <a href="#/sign-in">Sign-In</a>.
+            </p>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="register.html" type="text/ng-template">
+    <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+    <ion-view title="Register">
+        <ion-content padding="true">
+            <div class="list">
+                <label class="item item-input">
+                    <span class="input-label">Name</span>
+                    <input type="text">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">User Name</span>
+                    <input type="text">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">Email</span>
+                    <input type="email">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">phone</span>
+                    <input type="number">
+                </label>
+
+                <label class="item item-input">
+                    <span class="input-label">Password</span>
+                    <input type="password">
+                </label>
+
+                <label class="item item-input">
+                    <span class="input-label">Verify Password</span>
+                    <input type="password">
+                </label>
+
+                <button class="button button-block button-positive">Summit</button>
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+
+
+<script id="home.html" type="text/ng-template">
+    <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+    <ion-view title="Home">
+        <ion-content padding="true">
+            <div class="row">
+
+                        <div class="col col-50 box" style="">
+                            <a href="#/tab/price/home">
+                                <div class="box-home" style="width: 80%; margin: 0 auto;background-color: red">
+                                    <img class="box-inner" style="width: 100%" src="img/p.png" >
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col col-50 box"  style="">
+                            <a href="#/tab/market/home" >
+                                <div class="box-home" style="width: 80%; margin: 0 auto;background-color: blue">
+                                    <img class="box-inner" style="width: 100%" src="img/m.png" >
+                                </div>
+                            </a>
+                        </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col col-50 box" style="">
+                    <a href="#/tab/news-list">
+                        <div class="box-home" style="width: 80%; margin: 0 auto;background-color: red">
+                            <img class="box-inner" style="width: 100%" src="img/n.png" >
+                        </div>
+                    </a>
+                </div>
+                <div class="col col-50 box"  style="">
+                    <a href="#/tab/download" >
+                        <div class="box-home" style="width: 80%; margin: 0 auto;background-color: blue">
+                            <img class="box-inner" style="width: 100%" src="img/d.png" >
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+            <div class="row">
+
+                <div class="col col-50 box" style="">
+                    <a href="#tab/market-perf">
+                        <div class="box-home" style="width: 80%; margin: 0 auto;background-color: red">
+                            <img class="box-inner" style="width: 100%" src="img/market.png" >
+                        </div>
+                    </a>
+                </div>
+                <div class="col col-50 box"  style="">
+                    <a href="#ab/about" >
+                        <div class="box-home" style="width: 80%; margin: 0 auto;background-color: blue">
+                            <img class="box-inner" style="width: 100%" src="img/a.png" >
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="account-menu.html" type="text/ng-template">
+    <ion-side-menus>
+        <ion-side-menu-content>
+            <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+            <ion-nav-buttons side="left">
+                <button class="button button-icon button-clear ion-navicon" ng-click="toggleLeft()">
+                </button>
+            </ion-nav-buttons>
+            <ion-nav-view name="accountContent"></ion-nav-view>
+        </ion-side-menu-content>
+
+        <ion-side-menu side="left">
+            <ion-header-bar class="bar-dark">
+                <h1 class="title">Account Menu</h1>
+            </ion-header-bar>
+            <ion-content >
+
+                <ion-list>
+                    <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/account/dashboard">
+                        <i class="icon ion-home"></i>
+                        Dashboard
+                    </ion-item>
+                    <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/account/my-produce">
+                        <i class="icon ion-person"></i>
+                        My Produce
+                    </ion-item>
+                    <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/account/produce-posted">
+                        <i class="icon ion-ios7-briefcase"></i>
+                       Produce Posted
+                    </ion-item>
+                    <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/account/orders">
+                        <i class="icon ion-ios7-pricetag"></i>
+                        Orders
+                    </ion-item>
+                    <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/account/carts">
+                        <i class="icon ion-ios7-cart"></i>
+                        Cart
+                    </ion-item>
+                    <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/account/profile">
+                        <i class="icon ion-ios7-people"></i>
+                        Profile
+                    </ion-item>
+                    <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/account/manage">
+                        <i class="icon ion-settings"></i>
+                        Manage
+                    </ion-item>
+                </ion-list>
+
+            </ion-content>
+        </ion-side-menu>
+
+    </ion-side-menus>
+
+
+</script>
+
+<script id="price-menu.html" type="text/ng-template">
+    <ion-side-menus>
+        <ion-side-menu-content>
+            <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+            <ion-nav-buttons side="left">
+                <button class="button button-icon button-clear ion-navicon" ng-click="toggleLeft()">
+                </button>
+            </ion-nav-buttons>
+            <ion-nav-view name="menuContent"></ion-nav-view>
+        </ion-side-menu-content>
+
+        <ion-side-menu side="left">
+            <ion-header-bar class="bar-dark">
+                <h1 class="title">Price Menu</h1>
+            </ion-header-bar>
+            <ion-content >
+
+                <ion-list>
+                    <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/price/home">
+                        <i class="icon ion-radio-waves"></i>
+                        Home
+                    </ion-item>
+                    <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/price/download">
+                        <i class="icon ion-android-download"></i>
+                        Download Data
+                    </ion-item>
+                    <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/price/request">
+                        <i class="icon ion-ios7-people"></i>
+                        Request Data
+                    </ion-item>
+                </ion-list>
+
+            </ion-content>
+        </ion-side-menu>
+
+    </ion-side-menus>
+
+
+</script>
+
+<script id="market-menu.html" type="text/ng-template">
+    <ion-side-menus>
+        <ion-side-menu-content>
+            <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+            <ion-nav-buttons side="left">
+                <button class="button button-icon button-clear ion-navicon" ng-click="toggleLeft()">
+                </button>
+            </ion-nav-buttons>
+            <ion-nav-view name="marketContent"></ion-nav-view>
+        </ion-side-menu-content>
+
+        <ion-side-menu side="left">
+            <ion-header-bar class="bar-dark">
+                <h1 class="title">Filter Commodity</h1>
+            </ion-header-bar>
+            <ion-content >
+
+                <div class="list">
+
+                    <label class="item item-input item-select">
+                        <div class="input-label">
+                            Select State
+                        </div>
+                        <select>
+                            <option selected>Lagos</option>
+                            <option >Ogun</option>
+                            <option></option>
+                        </select>
+                    </label>
+
+                    <label class="item item-input item-select">
+                        <div class="input-label">
+                            Select Category
+                        </div>
+                        <select>
+                            <option selected>Tuber</option>
+                            <option >Cereals</option>
+                            <option>Legumes</option>
+                        </select>
+                    </label>
+
+                    <label class="item item-input item-select">
+                        <div class="input-label">
+                            Select Commodity
+                        </div>
+                        <select>
+                            <option selected>Rice</option>
+                            <option >Beans</option>
+                            <option>Yam</option>
+                        </select>
+                    </label>
+                <a class="button button-full button-positive" menu-toggle="left">Search</a>
+                </div>
+
+            </ion-content>
+        </ion-side-menu>
+
+    </ion-side-menus>
+
+</script>
+
+<script id="dashboard.html" type="text/ng-template">
+    <ion-view title="Dashboard">
+        <ion-content>
+            <div class="row">
+                <div class="col col-offset-20 col-60 box" >
+                    <a href="#">
+                        <div class="box-wrap">
+                            <div class="box-inner" style="background-color: red;">
+                                <div class="vertical-center-content">
+                                <span style="font-size: 5vw; margin-bottom: 2vw" >{{ 5 }}</span> <br>
+                                <div style="font-size: 3.5vw;">Produce Posted</div>
+                            </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col col-20" ></div>
+            </div>
+
+            <div class="row">
+                <div class="col col-offset-20 col-60 box" >
+                    <a href="#">
+                        <div class="box-wrap">
+                            <div class="box-inner" style="background-color: orange;">
+                                <div class="vertical-center-content">
+                                    <span style="font-size: 5vw; margin-bottom: 2vw" >{{ 5 }}</span> <br>
+                                    <div style="font-size: 3.5vw;">Orders Made</div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col col-20" ></div>
+            </div>
+
+            <div class="row">
+                <div class="col col-offset-20 col-60 box" >
+                    <a href="#">
+                        <div class="box-wrap">
+                            <div class="box-inner" style="background-color: green;">
+                                <div class="vertical-center-content">
+                                    <span style="font-size: 5vw; margin-bottom: 2vw" >{{ 5 }}</span> <br>
+                                    <div style="font-size: 3.5vw;">Produce Dealing With</div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col col-20" ></div>
+            </div>
+
+            <div class="row">
+                <div class="col col-offset-20 col-60 box" >
+                    <a href="#">
+                        <div class="box-wrap">
+                            <div class="box-inner" style="background-color: blue;">
+                                <div class="vertical-center-content">
+                                    <span style="font-size: 5vw; margin-bottom: 2vw" >{{ 5 }}</span> <br>
+                                    <div style="font-size: 3.5vw;">Produce In Your Shopping Cart</div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col col-20" ></div>
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="my-produce.html" type="text/ng-template">
+
+    <ion-view title="My Produce">
+        <ion-content padding="true">
+            <h4>Click on Each Item Below to Add It To Your List</h4>
+            <a href="#"><span class="badge badge-positive">Rice</span></a>
+            <a href="#"><span class="badge badge-positive">Beans</span></a>
+                <a href="#"><span class="badge badge-positive">Cassava</span></a>
+                    <a href="#"><span class="badge badge-positive">Garri</span></a>
+            <hr>
+            <h4>Click on Each Item Below to Remove It From Your List</h4>
+                        <a href="#"><span class="badge badge-balanced">Rice</span></a>
+                            <a href="#"><span class="badge badge-balanced">Beans</span></a>
+                                <a href="#"><span class="badge badge-balanced">Cassava</span></a>
+                                    <a href="#"> <span class="badge badge-balanced">Garri</span></a>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="produce-posted.html" type="text/ng-template">
+
+    <ion-view title="Produce Posted">
+
+        <ion-content>
+<div class="padding">
+    <a href="#/tab/account/new-produce" class="button button-positive button-block">Add New Produce</a>
+</div>
+            <div class="list">
+                <a class="item item-text-wrap" href="#">
+                    <span>Rice @ N5,000 | Bag</span>
+                    <span class="badge badge-assertive">12/5/2014</span>
+                </a>
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="new-produce.html" type="text/ng-template">
+    <ion-view title="New Produce">
+        <ion-content padding="true">
+            <div class="list">
+                <label class="item item-input">
+                    <span class="input-label">Name</span>
+                    <input type="text">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">Price</span>
+                    <input type="number">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">Description</span>
+                    <textarea rows="5"></textarea>
+                </label>
+
+                <label class="item item-input">
+                    <span class="input-label">Quantity In Stock</span>
+                    <input type="number">
+                </label>
+
+                <label class="item item-input item-select">
+                    <div class="input-label">
+                        Measure
+                    </div>
+                    <select>
+                        <option value="Bag">Bag</option>
+                        <option value="WheelBarrow">WheelBarrow</option>
+                        <option value="Lorry">Lorry</option>
+                        <option value="Litre">Litre</option>
+                        <option value="KG">KG</option>
+                    </select>
+                </label>
+
+                <label class="item item-input">
+                    <span class="input-label">Image</span>
+                    <input type="file">
+                </label>
+            </div>
+            <div class="button-bar">
+                <a class="button button-positive">Save</a>
+                <a class="button button-assertive">Cancel</a>
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="orders.html" type="text/ng-template">
+
+    <ion-view title="Orders Made">
+
+        <ion-content>
+
+            <div class="list">
+                <a class="item item-text-wrap" href="#/tab/account/order-details">
+                    <span style="font-size: 3.5vw">Id | 347 Total-Quantity | 5    Total-Price | N25,000</span>
+                    <span class="badge badge-assertive">12/5/2014</span>
+                </a>
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="order-details.html" type="text/ng-template">
+    <div class="modal" ng-controller="OrderDetailsCtrl">
+        <ion-header-bar class="bar bar-header bar-balanced">
+            <h1 class="title">Order 1 {{ id }}</h1>
+            <i class="button icon ion-close" ng-click="close()"></i>
+        </ion-header-bar>
+        <ion-content>
+
+            <div class="padding">
+                <h3>Order Date <span class="badge badge-assertive right">22/4/2014</span> </h3>
+
+                <div class="list">
+
+                    <div class="item item-divider">
+                        Rice
+                    </div>
+
+                    <div class="item">
+                        Quantity
+                        <span class="badge badge-balanced">5 Bags</span>
+                    </div>
+
+                    <div class="item">
+                        Price
+                        <span class="badge badge-balanced">5,000</span>
+                    </div >
+
+                    <div class="item item-divider">
+                        Beans
+                    </div>
+
+                    <div class="item">
+                        Quantity
+                        <span class="badge badge-balanced">5 Bags</span>
+                    </div>
+
+                    <div class="item">
+                        Price
+                        <span class="badge badge-balanced">5,000</span>
+                    </div >
+
+                    <div class="item item-divider">
+                        Total Price
+                        <span class="badge badge-balanced">10,000</span>
+                    </div>
+
+                </div>
+                <a class="button button-block button-assertive">Delete</a>
+            </div>
+
+
+        </ion-content>
+    </div>
+</script>
+
+
+<script id="cart.html" type="text/ng-template">
+
+    <ion-view title="Shopping Cart">
+
+        <ion-content>
+            <div class="padding">
+
+                <div class="list">
+
+                    <div class="item item-divider">
+                        Rice
+                        <a href=""><i class="right icon ion-close" style="margin-top: -15px; color: red" ng-click="close()"></i></a>
+                    </div>
+
+                    <div class="item">
+                        Quantity
+                        <span class="badge badge-balanced">5 Bags</span>
+                    </div>
+
+                    <div class="item">
+                        Price
+                        <span class="badge badge-balanced">5,000</span>
+                    </div >
+
+                    <div class="item item-divider">
+                        Beans
+                        <a href="#"><i class="right icon ion-close" style="margin-top: -15px; color: red" ng-click="close()"></i></a>
+                    </div>
+
+                    <div class="item">
+                        Quantity
+                        <span class="badge badge-balanced">5 Bags</span>
+                    </div>
+
+                    <div class="item">
+                        Price
+                        <span class="badge badge-balanced">5,000</span>
+                    </div >
+
+                    <div class="item item-divider">
+                        Total Price
+                        <span class="badge badge-balanced">10,000</span>
+                    </div>
+
+                </div>
+                </div>
+
+            <div class="button-bar padding">
+                <a class="button button-assertive">Clear Cart</a>
+                <a class="button button-positive">Checkout</a>
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="profile.html" type="text/ng-template">
+    <ion-view title="Profile">
+        <ion-content padding="true">
+            <div class="list">
+                <label class="item item-input">
+                    <span class="input-label">Name</span>
+                    <input type="text">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">Email</span>
+                    <input type="email">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">phone</span>
+                    <input type="number">
+                </label>
+
+                <label class="item item-input item-select">
+                <div class="input-label">
+                    Gender
+                </div>
+                <select>
+                    <option selected>Male</option>
+                    <option>Female</option>
+                </select>
+            </label>
+                <label class="item item-input item-select">
+                    <div class="input-label">
+                        Category
+                    </div>
+                    <select>
+                        <option selected>Farmer</option>
+                        <option>StalkHolder</option>
+                        <option>Business Men</option>
+                    </select>
+                </label>
+
+                <label class="item item-input">
+                    <span class="input-label">State</span>
+                    <input type="text">
+                </label>
+
+                <label class="item item-input">
+                    <span class="input-label">LGA</span>
+                    <input type="text">
+                </label>
+
+                <label class="item item-input">
+                    <span class="input-label">Village/City</span>
+                    <input type="text">
+                </label>
+
+                <label class="item item-input">
+                    <span class="input-label">Street Address</span>
+                    <input type="text">
+                </label>
+
+                <button class="button button-block button-positive">Summit</button>
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="download-data.html" type="text/ng-template">
+
+    <ion-view title="Download Data">
+        <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+        <ion-content>
+            <div class="list">
+                <div class="item item-text-wrap" href="#/tab/news">
+                    <span>Gidifarm Profile</span>
+                   <a href="#"> <span class="badge badge-assertive">download</span></a>
+                </div>
+                <div class="padding">
+                    <a href="#/tab/price/download" class="button button-block button-light">Click Here To Download Market Price Data</a>
+                </div>
+
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="news-list.html" type="text/ng-template">
+    <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+    <ion-view title="Agro News">
+        <ion-content>
+            <div class="list">
+                <a class="item item-text-wrap"  ng-click="showActionSheet()">
+                   <span>AGRIC MINISTER VISITS FISHING COMPANIES</span>
+                </a>
+            </div>
+            <Button  ng-click="show()">Click</Button>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="modal.html" type="text/ng-template">
+    <div class="modal" ng-controller="ModalCtrl">
+        <ion-header-bar class="bar bar-header bar-positive">
+            <h1 class="title">New Contact</h1>
+            <button class="button button-clear button-primary" ng-click="modal.hide()">Cancel</button>
+        </ion-header-bar>
+        <ion-content>
+            <div class="padding">
+                <div class="list">
+                    <label class="item item-input">
+                        <span class="input-label">First Name</span>
+                        <input ng-model="newUser.firstName" type="text">
+                    </label>
+                    <label class="item item-input">
+                        <span class="input-label">Last Name</span>
+                        <input ng-model="newUser.lastName" type="text">
+                    </label>
+                    <label class="item item-input">
+                        <span class="input-label">Email</span>
+                        <input ng-model="newUser.email" type="text">
+                    </label>
+                    <button class="button button-full button-positive" ng-click="createContact()">Create</button>
+                </div>
+            </div>
+        </ion-content>
+    </div>
+</script>
+
+<script id="news.html" type="text/ng-template">
+    <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+    <ion-view title="AGRIC MINISTER VISITS FISHING COMPANIES" >
+        <ion-content>
+            <div class="list card">
+                <div class="item item-text-wrap">
+                <h2>AGRIC MINISTER VISITS FISHING COMPANIES</h2>
+            </div>
+                <div class="item item-text-wrap">
+                    <p>Posted On <span class="badge badge-assertive" style="float: right">12/3/2014</span></p>
+                </div>
+
+                <div class="item item-body">
+                    <img class="full-image" src="delorean.jpg">
+                </div>
+
+
+                <div class="item tabs tabs-secondary tabs-icon-left">
+
+                    <a class="tab-item" href="#">
+                        <i class="icon ion-share">Share</i>
+                    </a>
+                </div>
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="market.html" type="text/ng-template">
+    <ion-view title="Agro Market">
+        <ion-content>
+           <div class="list">
+               <a class="item " href="#/tab/product/1">
+                   Palm Oil(Red) | 10 25litres
+                     <span class="item-note">N12,000</span>
+               </a>
+           </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="product.html" type="text/ng-template">
+    <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+    <ion-view title="Rice">
+        <ion-content>
+            <div class="list card">
+                <div class="item item-text-wrap">
+                    <h2>Unit Price<span style="float: right">N12,000</span></h2>
+                    <p> Quantity Available<span style="float: right">5 Bags</span></p>
+                </div>
+
+                <div class="item item-image">
+                    <img class="full-image" src="delorean.jpg">
+                </div>
+
+                <div class="item item-input-inset">
+                    <label class="item-input-wrapper">
+                        <input type="number" placeholder="Quantity Needed">
+                    </label>
+                    <button class="button button-balanced button-small">
+                        +
+                    </button>
+                    <button class="button button-stable button-small">
+                        -
+                    </button>
+                </div>
+
+                <div class="item tabs  tabs-icon-top">
+                    <a class="tab-item" href="#" title="add 2 cart">
+                        <i class="icon ion-ios7-cart "></i>
+                    </a>
+                    <a class="tab-item" href="#" title="buy now">
+                        <i class="icon ion-social-bitcoin"></i>
+                    </a>
+                    <a class="tab-item" href="#" title="share">
+                        <i class="icon ion-share"></i>
+                    </a>
+                </div>
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+
+
+<script id="price.html" type="text/ng-template">
+    <ion-view title="Agro Price">
+        <ion-content>
+            <div class="content-wrapper">
+
+            <div class="list">
+
+                <label class="item item-input item-select">
+                    <div class="input-label">
+                        Select State
+                    </div>
+                    <select>
+                        <option selected>Lagos</option>
+                        <option >Ogun</option>
+                        <option></option>
+                    </select>
+                </label>
+
+                <label class="item item-input item-select">
+                    <div class="input-label">
+                        Select Product
+                    </div>
+                    <select>
+                        <option selected>Rice</option>
+                        <option >Beans</option>
+                        <option>Yam</option>
+                    </select>
+                </label>
+            </div>
+            <button class="button button-block button-positive">Search</button>
+                </div>
+
+            <div class="list">
+
+                <div class="item item-divider">
+                  Rice @ Agege Market
+                </div>
+
+                <div class="item">
+                    Unit Price
+                    <span class="badge badge-balanced">N2,300</span>
+                </div>
+
+                <div class="item">
+                    Measure
+                    <span class="badge badge-balanced">1 Bag</span>
+                </div >
+
+                <div  class="item">
+                    Date Added
+                    <span class="badge badge-balanced">12/4/2014</span>
+                </div>
+
+
+            </div>
+
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="request.html" type="text/ng-template">
+
+    <ion-view title="Request Data">
+        <ion-content padding="true">
+            <div class="list">
+                <label class="item item-input">
+                    <span class="input-label">Name</span>
+                    <input type="text">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">Email</span>
+                    <input type="email">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">phone</span>
+                    <input type="number">
+                </label>
+                <label class="item item-input">
+                <span class="input-label">Details</span>
+                <textarea rows="5"></textarea>
+            </label>
+                <button class="button button-block button-positive">Send Request</button>
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="download-price.html" type="text/ng-template">
+    <ion-view title="Download Price Data">
+        <ion-content>
+            <div class="list">
+                <label class="item item-input item-select">
+                    <div class="input-label">
+                        Select Year
+                    </div>
+                    <select>
+                        <option selected>2014</option>
+                        <option >2013</option>
+                    </select>
+                </label>
+
+                <label class="item item-input item-select">
+                    <div class="input-label">
+                        Select Format
+                    </div>
+                    <select>
+                        <option selected>Pdf</option>
+                        <option >Doc</option>
+                        <option>Csv</option>
+                    </select>
+                </label>
+
+                <label class="item item-input item-select">
+                    <div class="input-label">
+                        Select State
+                    </div>
+                    <select>
+                        <option selected>Lagos</option>
+                        <option >Osun</option>
+                        <option>Cross River</option>
+                    </select>
+                </label>
+                <button class="button button-block button-positive">Summit</button>
+
+                    <div class="item item-divider">
+                       Lagos January Week 1 Report
+                    </div>
+
+                    <div class="item">
+                        <a href="#">download</a>
+                    </div>
+
+
+                    <div class="item item-divider">
+                        Lagos January Week 2 Report
+                    </div>
+
+                    <div class="item" href="#">
+                       <a href="#">download</a>
+                    </div>
+
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="about.html" type="text/ng-template">
+    <ion-view title="About">
+        <ion-content padding="true">
+            <h3>Create hybrid mobile apps with the web technologies you love.</h3>
+            <p>Free and open source, Ionic offers a library of mobile-optimized HTML, CSS and JS components for building highly interactive apps.</p>
+            <p>Built with Sass and optimized for AngularJS.</p>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="tabs.html" type="text/ng-template">
+    <ion-tabs class="tabs-icon-top tabs-balanced">
+
+        <ion-tab title="Home" icon="ion-home" href="#/tab/home">
+            <ion-nav-view name="home-tab"></ion-nav-view>
+        </ion-tab>
+
+        <ion-tab title="Account" icon="ion-ios7-information" href="#/tab/account/dashboard">
+            <ion-nav-view name="account-tab"></ion-nav-view>
+        </ion-tab>
+
+        <ion-tab title="Sign-Out" icon="ion-log-out" href="#/sign-in">
+        </ion-tab>
+
+    </ion-tabs>
+</script>
+
+</body>
+</html>
