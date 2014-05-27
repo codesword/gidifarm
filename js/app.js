@@ -314,7 +314,7 @@ angular.module('ionicApp', ['ionic'])
 
 .factory('Data', ['$http', function($http){
     var state = null;
-    var baseUrl = 'http://localhost/gidifarm-api/gidifarm-api/';
+    var baseUrl = 'http://www.gidifarm.com/gidifarm-api/';
     return {
         states               : null,
         selectedState        : null,
@@ -391,7 +391,7 @@ angular.module('ionicApp', ['ionic'])
             var id = this.currentUser.Id;
             return $http.get(baseUrl + 'customers/' + id + '/cultivatedProducts');
         },
-        getCommodities              : function(){
+        getAllCommodities              : function(){
             return $http.get(baseUrl + 'commodities');
         },
         getPostedNo                 : function(){
@@ -482,6 +482,8 @@ angular.module('ionicApp', ['ionic'])
 
 .controller('PriceCtrl', ['$scope', 'Data', function($scope, Data){
     $scope.noProduceDisplay = false;
+        $scope.stateId = 0;
+        $scope.commId = 0;
     if(Data.states == null){
         Data.getStates().success(function(data){
             Data.states = data;
@@ -491,47 +493,82 @@ angular.module('ionicApp', ['ionic'])
     else {
         $scope.states = Data.states;
     }
+       // $scope.stateId = null;
 
-    var newState = false;
+        var newState = false;
 
-    $scope.getCommodities = function(state){
-        if(Data.selectedState != state){
-            Data.getCommodities(state.Id).success(function(data){
-                console.log(data);
+        $scope.getCommodities = function(state){
+            if(Data.selectedState != state){
+                Data.getCommodities(state.Id).success(function(data){
+                    //console.log(data);
+                    Data.commodities = data;
+                    $scope.commodities = data;
+                    Data.selectedState = state;
+                    newState = true;
+                });
+            }
+            else{
+                $scope.commodities = Data.commodities;
+                newState = false;
+            }
+        };
+
+        $scope.getProducts = function(comm){
+            if(Data.selectedCommodity != comm || newState){
+                if(Data.selectedState == null) return;
+                Data.getProducts(Data.selectedState, comm).success(function(data){
+                    if(data == "null" || !angular.isArray(data)) {
+                        $scope.products = null;
+
+                        $scope.noProduceDisplay = true;
+                        return;
+                    }
+                    $scope.noProduceDisplay = false;
+                    Data.products = data;
+                    // console.log(data);
+                    $scope.products = data;
+                    Data.selectedCommodity = comm;
+                });
+            }
+            else {
+                $scope.products = Data.products;
+            }
+        };
+
+        $scope.$watch('stateId', function () {
+            $scope.loading = true;
+           // if($scope.stateId == null) return;
+            Data.getCommodities($scope.stateId).success(function(data){
+                //console.log(data);
+                $scope.loading = false;
                 Data.commodities = data;
                 $scope.commodities = data;
-                Data.selectedState = state;
-                newState = true;
             });
-        }
-        else{
-            $scope.commodities = Data.commodities;
-            newState = false;
-        }
-    };
+        });
 
-    $scope.getProducts = function(comm){
-        if(Data.selectedCommodity != comm || newState){
-            if(Data.selectedState == null) return;
-            Data.getProducts(Data.selectedState, comm).success(function(data){
+        $scope.closeAlert = function(){
+            $scope.alerts = [];
+        }
+
+        $scope.$watch('commId', function () {
+            $scope.loading = true;
+            console.log($scope.stateId);
+            Data.getProducts($scope.stateId, $scope.commId).success(function (data) {
+                $scope.loading = false;
                 if(data == "null" || !angular.isArray(data)) {
                     $scope.products = null;
+                    $scope.alerts = [];
+                    $scope.alerts[0] = {type : 'danger', msg : 'No Price Available For the Selected Commodity In The Selected State.'};
 
-                    $scope.noProduceDisplay = true;
                     return;
                 }
-                $scope.noProduceDisplay = false;
                 Data.products = data;
-                console.log(data);
+                // console.log(data);
                 $scope.products = data;
-                Data.selectedCommodity = comm;
             });
-        }
-        else {
-            $scope.products = Data.products;
-        }
-    };
-}])
+        })
+
+    }])
 
 .controller('NewsCtrl',['$scope', 'Data', '$location','$ionicModal','$ionicActionSheet', function($scope, Data, $location, $ionicModal,$ionicActionSheet){
   /*  if(Data.news == null){
@@ -558,34 +595,6 @@ angular.module('ionicApp', ['ionic'])
         });
 
 
-        $scope.show = function () {
-console.log('yes');
-            $ionicActionSheet.show({
-                titleText: 'ActionSheet Example',
-                buttons: [
-                    {
-                        text: 'Share'
-                    },
-                    {
-                        text: 'Move'
-                    },
-                ],
-                destructiveText: 'Delete',
-                cancelText: 'Cancel',
-                cancel: function () {
-                    console.log('CANCELLED');
-                },
-                buttonClicked: function (index) {
-                    console.log('BUTTON CLICKED', index);
-                    $scope.modal.show();
-                    return true;
-                },
-                destructiveButtonClicked: function () {
-                    console.log('DESTRUCT');
-                    return true;
-                }
-            });
-        };
 
 
 }])
@@ -963,7 +972,7 @@ console.log('yes');
     };
 }])
 
-.controller('OrdersCtrl', ['$scope', function($scope){
+.controller('OrdersCtrl', ['$scope','$ionicActionSheet','$ionicModal', function($scope,$ionicActionSheet, $ionicModal){
  /*   if (Data.orders != null) {
         $scope.orders = Data.orders;
     } else Data.getOrders().success(function (data) {
@@ -972,6 +981,40 @@ console.log('yes');
         Data.orders = data;
     });
     */
+        $ionicModal.fromTemplateUrl('order-details.html', function (modal) {
+            $scope.modal = modal;
+        }, {
+            animation: 'slide-in-up',
+            focusFirstInput: true
+        });
+
+        $scope.show = function () {
+            console.log('yes');
+            $ionicActionSheet.show({
+                titleText: 'Order Options',
+                buttons: [
+                    {
+                        text: 'Show Details'
+                    },
+
+                ],
+                destructiveText: 'Delete',
+                cancelText: 'Cancel',
+                cancel: function () {
+                    console.log('CANCELLED');
+                },
+                buttonClicked: function (index) {
+                    console.log('BUTTON CLICKED', index);
+                    $scope.modal.show();
+                    return true;
+                },
+                destructiveButtonClicked: function () {
+                    console.log('DESTRUCT');
+                    return true;
+                }
+            });
+        };
+
 
 
     }])
