@@ -359,7 +359,7 @@ angular.module('ionicApp', ['ionic'])
         getNewsById              : function(id){
             return $http.get(baseUrl + 'news/' + id ); },
         getProducts          : function(state, comm){
-            return $http.get(baseUrl + 'states/' + state.Id + '/' + comm.Id + '/products');},
+            return $http.get(baseUrl + 'states/' + state + '/' + comm + '/products');},
         getMProduct          : function(id){
             return $http.get(baseUrl + 'sproducts/' + id );},
         getMProducts         : function(state, comm){
@@ -482,8 +482,8 @@ angular.module('ionicApp', ['ionic'])
 
 .controller('PriceCtrl', ['$scope', 'Data', function($scope, Data){
     $scope.noProduceDisplay = false;
-        $scope.stateId = 0;
-        $scope.commId = 0;
+        $scope.values = {};
+        //$scope.commId = 0;
     if(Data.states == null){
         Data.getStates().success(function(data){
             Data.states = data;
@@ -493,17 +493,19 @@ angular.module('ionicApp', ['ionic'])
     else {
         $scope.states = Data.states;
     }
+        $scope.state = {};
        // $scope.stateId = null;
 
         var newState = false;
 
-        $scope.getCommodities = function(state){
-            if(Data.selectedState != state){
-                Data.getCommodities(state.Id).success(function(data){
+        $scope.getCommodities = function(){
+            console.log($scope.state);
+            if(Data.selectedState != $scope.state.Name){
+                Data.getCommodities($scope.state.Id).success(function(data){
                     //console.log(data);
                     Data.commodities = data;
                     $scope.commodities = data;
-                    Data.selectedState = state;
+                    Data.selectedState = $scope.state;
                     newState = true;
                 });
             }
@@ -535,10 +537,10 @@ angular.module('ionicApp', ['ionic'])
             }
         };
 
-        $scope.$watch('stateId', function () {
+        $scope.$watch('values.stateId', function () {
             $scope.loading = true;
            // if($scope.stateId == null) return;
-            Data.getCommodities($scope.stateId).success(function(data){
+            Data.getCommodities($scope.values.stateId).success(function(data){
                 //console.log(data);
                 $scope.loading = false;
                 Data.commodities = data;
@@ -550,10 +552,10 @@ angular.module('ionicApp', ['ionic'])
             $scope.alerts = [];
         }
 
-        $scope.$watch('commId', function () {
+        $scope.$watch('values.commId', function () {
             $scope.loading = true;
-            console.log($scope.stateId);
-            Data.getProducts($scope.stateId, $scope.commId).success(function (data) {
+            console.log($scope.values);
+            Data.getProducts($scope.values.stateId, $scope.values.commId).success(function (data) {
                 $scope.loading = false;
                 if(data == "null" || !angular.isArray(data)) {
                     $scope.products = null;

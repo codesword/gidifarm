@@ -935,9 +935,10 @@
                     <div class="input-label">
                         Select State
                     </div>
-                    <select>
-                        <option></option>
-                        <option ng-repeat="state in states" ng-click="getCommodities(state)">{{ state.Name }}</option>
+                    <select  class="form-control" ng-model="values.stateId"
+                             ng-options="state.Id as state.Name for state in states">
+                        <!--<option></option>
+                        <option ng-repeat="state in states" ng-click="getCommodities(state)">{{ state.Name }}</option>-->
                     </select>
                 </label>
 
@@ -945,13 +946,13 @@
                     <div class="input-label">
                         Select Product
                     </div>
-                    <select>
-                        <option></option>
-                        <option ng-repeat="comm in commodities" ng-click="getProducts(comm)">{{ comm.Name }}</option>
+                    <select  class="form-control" ng-model="values.commId"
+                             ng-options="comm.Id as comm.Name for comm in commodities">
+                        <!-- <option></option>
+                         <option ng-repeat="comm in commodities" ng-click="getProducts(comm)">{{ comm.Name }}</option>-->
                     </select>
                 </label>
             </div>
-           
                 </div>
 
             <div class="list padding" ng-repeat="prod in products">
@@ -963,9 +964,12 @@
                 <div class="item item-icon-left">
                     <i class="icon ion-ios7-pricetag"></i>
                     Unit Price per {{ prod.Measure }}
-                    <span class="badge badge-balanced">{{ prod.Price | nairacurrency }}</span>
+                    <span class="badge badge-balanced">{{ prod.Price }}</span>
                 </div>
-          </div>
+
+
+            </div>
+
         </ion-content>
     </ion-view>
 </script>
