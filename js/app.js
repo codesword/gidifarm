@@ -129,7 +129,7 @@ angular.module('ionicApp', ['ionic'])
                 views: {
                     'home-tab': {
                         templateUrl: "market-menu.html",
-                        controller: ''
+                        controller: 'MarketMenuCtrl'
                     }
                 }
             })
@@ -139,7 +139,7 @@ angular.module('ionicApp', ['ionic'])
                 views: {
                     'marketContent': {
                         templateUrl: "market.html",
-                        controller: ''
+                        controller: 'MarketCtrl'
                     }
                 }
             })
@@ -238,11 +238,12 @@ angular.module('ionicApp', ['ionic'])
 
 
 
-            .state('about', {
+            .state('tabs.about', {
                 url: "/about",
                 views: {
                     'home-tab': {
-                        templateUrl: "about.html"
+                        templateUrl: "about.html",
+                        controller: "AboutCtrl"
                     }
                 }
             })
@@ -307,6 +308,20 @@ angular.module('ionicApp', ['ionic'])
 
     })
 
+    .controller('AboutCtrl', function($scope, $state, $ionicSlideBoxDelegate) {
+        $scope.next = function() {
+            $ionicSlideBoxDelegate.next();
+        };
+        $scope.previous = function() {
+            $ionicSlideBoxDelegate.previous();
+        };
+
+        // Called each time the slide changes
+        $scope.slideChanged = function(index) {
+            $scope.slideIndex = index;
+        };
+    })
+
     .controller('HomeTabCtrl', function($scope) {
         console.log('HomeTabCtrl');
     })
@@ -362,10 +377,12 @@ angular.module('ionicApp', ['ionic'])
             return $http.get(baseUrl + 'states/' + state + '/' + comm + '/products');},
         getMProduct          : function(id){
             return $http.get(baseUrl + 'sproducts/' + id );},
-        getMProducts         : function(state, comm){
-            var CId = comm == null ? 0 : comm.Id;
-            var SId = state == null? "all" : state.Name;
-            return $http.get(baseUrl + 'states/' + SId + '/' + CId + '/sproducts');},
+        getAllMProduct          : function(){
+            return $http.get(baseUrl + 'sproducts');},
+        getMProducts         : function(st, cat, comm){
+            return $http.get(baseUrl + 'states/' + st + '/sproducts?category= ' + cat + '&commodity= ' + comm );},
+        getCategories        : function(){
+            return $http.get(baseUrl + 'commodities/categories'); },
         contact              : function(data){
             return $http.post(baseUrl + 'customers/contact', data);},
         register             : function(user) {
@@ -394,6 +411,8 @@ angular.module('ionicApp', ['ionic'])
         getAllCommodities              : function(){
             return $http.get(baseUrl + 'commodities');
         },
+        getMCommodities      : function(cat){
+            return $http.get(baseUrl + 'commodities?category=' + cat); },
         getPostedNo                 : function(){
             var id = this.currentUser.Id;
             return $http.get(baseUrl + 'customers/' + id + '/postedProductsNumber');
@@ -691,77 +710,110 @@ angular.module('ionicApp', ['ionic'])
     }
 }])
 
-.controller('MarketCtrl', ['$scope', 'Data', 'shoppingCart', '$location', function($scope, Data, shoppingCart, $location){
+    .controller('MarketMenuCtrl', ['$scope', 'Data', '$rootScope', '$location', function($scope, Data, $rootScope, $location){
+        $scope.closeAlert = function() {
+            $scope.alerts = ($scope.cart.alerts = []);
+        };
+        $scope.menu = {};
+        Data.selectedMState = {};
+        Data.selectedMCommodity = {};
 
-    Data.selectedMState = {};
-    Data.selectedMCommodity = {};
-    $scope.hideSidebar  = false;
-    $scope.cart = shoppingCart;
-    $scope.alerts = $scope.cart.alerts;
+        (function(){
+            if(Data.states == null){
+                Data.getStates().success(function(data){
+                    Data.states = data;
+                    $scope.states  = data;
+                    // console.log(data);
+                });
+            }
+            else {
+                $scope.states = Data.states;
+            }
+        })();
 
+        (function(){
+            if(Data.categories == null){
+                Data.getCategories().success(function(data){
+                    Data.categories = data;
+                    $scope.categories = data;
+                    // console.log(data);
+                });
+            }
+            else{
+                $scope.categories = Data.categories;
+            }
+        })();
 
-    $scope.closeAlert = function() {
-        $scope.alerts = ($scope.cart.alerts = []);
-    };
-    (function(){
-        if(Data.states == null){
-            Data.getStates().success(function(data){
-                Data.states = data;
-                $scope.states  = data;
-            });
-        }
-        else {
-            $scope.states = Data.states;
-        }
-    })();
-
-    (function(){
-        if(Data.marketCommodities == null){
-            Data.getMCommodities().success(function(data){
+        var getMarketCommodities = function(category){
+            Data.getMCommodities(category).success(function(data){
                 Data.marketCommodities = data;
                 $scope.commodities = data;
+                //console.log(data);
             });
+
+        };
+
+        $scope.$watch('menu.category', function(val, old){
+            if(angular.isUndefined(val)) return;
+
+            getMarketCommodities(val.trim());
+        })
+
+        $scope.search = function(){
+            console.log($scope.menu);
+            $rootScope.$broadcast('getProducts', $scope.menu);
         }
-        else{
-            $scope.commodities = Data.marketCommodities;
-        }
-    })();
+
+        var toNumber = function (value) {
+            value = value * 1;
+            return isNaN(value) ? 0 : value;
+        };
+
+        $scope.selectComm = function(comm){
+            $scope.selectedComm = comm;
+            Data.selectedMCommodity = comm;
+        };
+
+        $scope.selectState = function(state){
+            $scope.selectedState = state;
+            Data.selectedMState = state;
+        };
+
+
+    }])
+
+.controller('MarketCtrl', ['$scope', 'Data', '$rootScope', '$location', function($scope, Data, $rootScope, $location){
+
+        (function(){
+            if(Data.marketProducts == null){
+                Data.getAllMProduct().success(function (data) {
+                    var products;
+                    data == "null" ? $scope.products = null : $scope.products = data;
+                    $scope.alerts = [];
+                })
+            }else{
+                $scope.products = Data.marketProducts;
+            }
+        })();
 
     $scope.toggle = function(){
         $scope.hideSidebar = !$scope.hideSidebar;
     };
-
-    var getProducts = function (state, comm){
-        if(Data.selectedMCommodity != comm || Data.selectedMState != state){
-            Data.getMProducts(state, comm).success(function(data){
+        var getProducts = function (params){
+            console.log(params);
+            var state = angular.isUndefined(params.state) ? 'all' : params.state;
+            var cat = angular.isUndefined(params.category) ? 'all' : params.category;
+            var comm = angular.isUndefined(params.commodity) ? '' : params.commodity;
+            Data.getMProducts(state, cat.trim(), comm).success(function(data){
+                data == "" ? $scope.products = null : $scope.products = data;
                 console.log(data);
-                // if(data == "null");
-                // $scope.products = null;
-                data == "null" ? $scope.products = null : $scope.products = data;
-                data == "null" ? $scope.alerts[0] = {type : 'danger', msg : 'No Produce For The Selected State & Commodity'} : $scope.alerts[0] = {type : 'success', msg : 'Successfully Loaded Product In The Selected State & Commodity'};
-                Data.marketProducts = data;
             });
-        }
-        else{
-            $scope.products = Data.marketProducts;
-            $scope.alerts[0] = {type : 'success', msg : 'Successfully Loaded All Products Matching The Selected State & Commodity'};
-        }
-    };
 
-    getProducts(null, null);
+        };
 
-    $scope.selectState = function(state){
-        $scope.selectedState = state;
-        getProducts($scope.selectedState, $scope.selectedComm);
-        Data.selectedMState = state;
-        //getProducts(Data.selectedMState, Data.selectedMCommodity);
-    };
-
-    $scope.selectComm = function(comm){
-        $scope.selectedComm = comm;
-        getProducts($scope.selectedState, $scope.selectedComm);
-        Data.selectedMCommodity = comm;
-    };
+        $rootScope.$on('getProducts', function(event, params){
+            getProducts(params);
+        })
 
     $scope.details = function(prod){
         Data.selectedMProduct = prod;

@@ -212,24 +212,12 @@
             <div class="row">
 
                 <div class="col col-50 box" style="">
-                    <a href="#tab/market-perf">
-                        <div class="box-home" style="width: 80%; margin: 0 auto;background-color: red">
-                            <img class="box-inner" style="width: 100%" src="img/marInformtn.png" >
+                    <a href="#/tab/market-perf">
+                        <div class="box-home" style="width: 80%; margin: 0 auto;">
+                            <img class="box-inner" style="width: 100%" src="img/marketPerf.jpg" >
                         </div>
                     </a>
                 </div>
-                <div class="col col-50 box"  style="">
-                    <a href="#ab/download" >
-                        <div class="box-home" style="width: 80%; margin: 0 auto;background-color: blue">
-                            <img class="box-inner" style="width: 100%" src="img/download.png" >
-                        </div>
-                    </a>
-                </div>
-
-            </div>
-
-            <div class="row">
-
                 <div class="col col-50 box" style="">
                     <a href="#/tab/news-list">
                         <div class="box-home" style="width: 70%; margin: 0 auto;">
@@ -237,9 +225,21 @@
                         </div>
                     </a>
                 </div>
+
+            </div>
+
+            <div class="row">
+                   <div class="col col-50 box"  style="">
+                    <a href="#/tab/download" >
+                        <div class="box-home" style="width: 80%; margin: 0 auto;">
+                            <img class="box-inner" style="width: 100%" src="img/download.png" >
+                        </div>
+                    </a>
+                </div>
+                
                 <div class="col col-50 box"  style="">
                     <a href="#/tab/about" >
-                        <div class="box-home" style="width: 70%; margin: 0 auto;background-color: blue">
+                        <div class="box-home" style="width: 70%; margin: 0 auto;">
                             <img class="box-inner" style="width: 100%" src="img/about.jpg" >
                         </div>
                     </a>
@@ -327,7 +327,7 @@
 
                 <ion-list>
                     <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/price/home">
-                        <i class="icon ion-radio-waves"></i>
+                        <i class="icon ion-home"></i>
                         Home
                     </ion-item>
                     <ion-item item-type="item-icon-left" nav-clear menu-close href="#/tab/price/download">
@@ -371,10 +371,9 @@
                         <div class="input-label">
                             Select State
                         </div>
-                        <select>
-                            <option selected>Lagos</option>
-                            <option >Ogun</option>
-                            <option></option>
+
+                        <select ng-model="menu.state"
+                                ng-options="s.Name as s.Name for s in states">
                         </select>
                     </label>
 
@@ -382,10 +381,8 @@
                         <div class="input-label">
                             Select Category
                         </div>
-                        <select>
-                            <option selected>Tuber</option>
-                            <option >Cereals</option>
-                            <option>Legumes</option>
+                        <select ng-model="menu.category"
+                            ng-options="cat.Name as cat.Name for cat in categories">
                         </select>
                     </label>
 
@@ -393,13 +390,13 @@
                         <div class="input-label">
                             Select Commodity
                         </div>
-                        <select>
-                            <option selected>Rice</option>
-                            <option >Beans</option>
-                            <option>Yam</option>
+                        <select ng-model="menu.commodity"
+                                ng-options="comm.Name as comm.Name for comm in commodities">
                         </select>
                     </label>
-                <a class="button button-full button-positive" menu-toggle="left">Search</a>
+                    <div class="padding">
+                <a class="button button-full button-positive" ng-click="search()" menu-toggle="left">Get Products</a>
+                    </div>
                 </div>
 
             </ion-content>
@@ -871,9 +868,9 @@
     <ion-view title="Agro Market">
         <ion-content>
            <div class="list">
-               <a class="item " href="#/tab/product/1">
-                   Palm Oil(Red) | 10 25litres
-                     <span class="item-note">N12,000</span>
+               <a class="item " ng-href="'#/tab/product/'product.Id" ng-repeat="product in products | orderBy:'name'">
+                   {{ product.Name }} | {{ product.Quantity }} {{ product.Measure }}
+                     <span class="item-note">{{ product.Price | nairacurrency}}</span>
                </a>
            </div>
         </ion-content>
@@ -964,7 +961,7 @@
                 <div class="item item-icon-left">
                     <i class="icon ion-ios7-pricetag"></i>
                     Unit Price per {{ prod.Measure }}
-                    <span class="badge badge-balanced">{{ prod.Price }}</span>
+                    <span class="badge badge-balanced">{{ prod.Price | nairacurrency}}</span>
                 </div>
 
 
@@ -1043,17 +1040,66 @@
                     </div>
 
                     <div class="item">
-                        <a href="#">download</a>
+                        <a href="http://www.gidifarm.com/pdf/GFJwk1y14.pdf">download</a>
                     </div>
 
 
                     <div class="item item-divider">
-                        Lagos January Week 2 Report
-                    </div>
+                  Lagos January Week 2 Report
+                   </div>
 
-                    <div class="item" href="#">
-                       <a href="#">download</a>
-                    </div>
+                <div class="item" >
+                    <a href="http://gidifarm.com/pdf/GFJwk2y14.pdf">download</a>
+                </div>
+
+                <div class="item item-divider">
+                    Lagos January Week 3 Report
+                </div>
+
+                <div class="item" >
+                    <a href="http://gidifarm.com/pdf/GFJwk3y14.pdf">download</a>
+                </div>
+
+                <div class="item item-divider">
+                    Lagos January Week 4 Report
+                </div>
+
+                <div class="item" >
+                    <a href="http://gidifarm.com/pdf/GFJwk4y14.pdf">download</a>
+                </div>
+
+                <div class="item item-divider">
+                    Lagos February Week 1 Report
+                </div>
+
+                <div class="item">
+                    <a href="http://gidifarm.com/pdf/GFFwk1y14.pdf">download</a>
+                </div>
+
+
+                <div class="item item-divider">
+                    Lagos February Week 2 Report
+                </div>
+
+                <div class="item" >
+                    <a href="http://gidifarm.com/pdf/GFFwk2y14.pdf">download</a>
+                </div>
+
+                <div class="item item-divider">
+                    Lagos February Week 3 Report
+                </div>
+
+                <div class="item" >
+                    <a href="http://gidifarm/pdf/GFFwk3y14.pdf">download</a>
+                </div>
+
+                <div class="item item-divider">
+                    Lagos February Week 4 Report
+                </div>
+
+                <div class="item" >
+                    <a href="http://gidifarm.com/GFFwk4y14.pdf">download</a>
+                </div>
 
             </div>
         </ion-content>
@@ -1061,13 +1107,175 @@
 </script>
 
 <script id="about.html" type="text/ng-template">
+    <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
     <ion-view title="About">
-        <ion-content padding="true">
-            <h3>Create hybrid mobile apps with the web technologies you love.</h3>
-            <p>Free and open source, Ionic offers a library of mobile-optimized HTML, CSS and JS components for building highly interactive apps.</p>
-            <p>Built with Sass and optimized for AngularJS.</p>
-        </ion-content>
+        <ion-nav-buttons side="left">
+            <button class="button button-positive  no-animation"
+                    ng-click="previous()" ng-if="slideIndex > 0">
+                Previous
+            </button>
+        </ion-nav-buttons>
+        <ion-nav-buttons side="right">
+            <button class="button button-positive no-animation"
+                    ng-click="next()" ng-if="slideIndex != 3">
+                Next
+            </button>
+        </ion-nav-buttons>
+        <ion-slide-box show-pager="false"  on-slide-changed="slideChanged(index)">
+            <ion-slide>
+
+                <div class="padding">
+                    <div class="bar bar-subheader">
+                        <h2 class="title">Who We Are</h2>
+                    </div>
+                    <div style="margin-top: 100px; font-size: 1.5em; font-family: sans-serif; font-weight: 600; line-height: 1.5em">
+                        <p>
+                        We are of a team of talented, Smart, Energic, Innovative youth that share the same goal and
+                        love to make impact in any environment we find our self in.
+                        </p>
+                        <p>
+                            We create solutions that empower farmers to work and communicate in new and innovative ways.
+                            Our solutions makes the farming profession more lucrative
+                        </p>
+                        <p>
+                        Our main product Gidi-Farm is a transparency tool for Nigerian farmers, Traders, Stakeholders,
+                        Government and Consumers of Agro-Products to get latest market information pertaining to the
+                        wholesale and retail price of Agro-Products. Our platform also allow the users to buy farm inputs
+                        directly from producers at favorable prices and find buyers for their products through our Agro-Market.
+                        </p>
+                    </div>
+                </div>
+            </ion-slide>
+            <ion-slide>
+                <div class="padding">
+                    <div class="bar bar-subheader">
+                        <h2 class="title">What We Do</h2>
+                    </div>
+                    <div style="margin-top: 100px; font-size: 1.5em; font-family: sans-serif; font-weight: 600; line-height: 1.5em">
+                        <p>
+                            Enable farmers and consumer of agro-products to inquire
+                            current market prices of different agro-products from different states and /or specific markets
+                        </p>
+                        <p>
+                            Enable farmers to sell collectively and connect them with a ready market.
+                        </p>
+                        <p>
+                            We give first class local news that happen in different Agro-markets and around Nigeria
+                        </p>
+                        <p>
+                            We supply farmers with relevant information relating to pest & disease control, storage etc.
+                        </p>
+                        <p>
+                            Aggregate farmers needs/orders and connect them with farm input suppliers.
+                        </p>
+
+                    </div>
+                </div>
+            </ion-slide>
+            <ion-slide>
+                <div class="padding">
+                    <div class="bar bar-subheader">
+                        <h2 class="title">How We Do It</h2>
+                    </div>
+                    <div style="margin-top: 100px; font-size: 1.5em; font-family: sans-serif; font-weight: 600; line-height: 1.5em">
+                        <p><h3 style="text-align: center">Web Sites</h3>
+                            Our Services is a
+                        </p>
+                        <p>
+                            Enable farmers to sell collectively and connect them with a ready market.
+                        </p>
+                        <p>
+                            We give first class local news that happen in different Agro-markets and around Nigeria
+                        </p>
+                        <p>
+                            We supply farmers with relevant information relating to pest & disease control, storage etc.
+                        </p>
+                        <p>
+                            Aggregate farmers needs/orders and connect them with farm input suppliers.
+                        </p>
+
+                    </div>
+                </div>
+            </ion-slide>
+            <ion-slide>
+                <div class="padding">
+                    <div class="bar bar-subheader">
+                        <h2 class="title">Meet The Team</h2>
+                    </div>
+                    <div class="list card" style="margin-top: 100px">
+                        <div class="item item-avatar">
+                            <img src="img/ikem.jpg">
+                            <h2>IKEM OKONKWO</h2>
+                            <p>Chief Technology Officer</p>
+                        </div>
+
+                        <div class="item item-image">
+                            <img src="img/ikem.jpg">
+                        </div>
+
+                        <div class="item tabs  tabs-icon-top">
+                            <a class="tab-item" href="http://facebook.com/dyoungikem" title="facebook">
+                                <i class="icon ion-social-facebook "></i>
+                            </a>
+                            <a class="tab-item" href="http://twitter.com/dyoungikem" title="twitter">
+                                <i class="icon ion-social-twitter"></i>
+                            </a>
+                            <a class="tab-item" href="https://plus.google.com/u/0/108794339732723092309" title="google plus">
+                                <i class="icon ion-social-googleplus"></i>
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <div class="list card">
+                        <div class="item item-avatar">
+                            <img src="img/boye.jpg">
+                            <h2>SALISU BOYE</h2>
+                            <p>Chief Operation Officer</p>
+                        </div>
+
+                        <div class="item item-image">
+                            <img src="img/boye.jpg">
+                        </div>
+
+                        <div class="item tabs  tabs-icon-top">
+                            <a class="tab-item" href="http://facebook.com/boye.salisu" title="facebook">
+                                <i class="icon ion-social-facebook "></i>
+                            </a>
+                            <a class="tab-item" href="http://twitter.com/boye0" title="twitter">
+                                <i class="icon ion-social-twitter"></i>
+                            </a>
+                            <a class="tab-item" href="" title="google plus">
+                                <i class="icon ion-social-googleplus"></i>
+                            </a>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </ion-slide>
+        </ion-slide-box>
     </ion-view>
+</script>
+
+<script id="abouts.html" type="text/ng-template">
+            <ion-slide-box show-pager="true">
+                <ion-slide>
+                    <view>
+                        <content padding="true" has-header="true">
+                            <h1>Page 1</h1>
+                        </content>
+                    </view>
+                </ion-slide>
+                <ion-slide>
+                    <div class="box yellow"><h1>YELLOW</h1></div>
+                </ion-slide>
+                <ion-slide>
+                    <div class="box pink"><h1>PINK</h1></div>
+                </ion-slide>
+            </ion-slide-box>
+
 </script>
 
 <script id="tabs.html" type="text/ng-template">
