@@ -1,7 +1,7 @@
 angular.module('ionicApp', ['ionic'])
 
-    .config(function($stateProvider, $urlRouterProvider) {
-
+    .config(function($stateProvider, $urlRouterProvider, $sceProvider) {
+        $sceProvider.enabled(false);
         $stateProvider
             .state('signin', {
                 url: "/sign-in",
@@ -149,11 +149,11 @@ angular.module('ionicApp', ['ionic'])
                         controller  : 'MarketCtrl'
             })
             .state('tabs.product', {
-                url: "/product/:id",
+                url: "/product",
                 views: {
                     'home-tab' :{
                         templateUrl : 'product.html',
-                        controller  : ''
+                        controller  : 'ProductCtrl'
                     }
                 }
             })
@@ -183,7 +183,7 @@ angular.module('ionicApp', ['ionic'])
                 views: {
                     'home-tab' :{
                         templateUrl : 'news.html',
-                        controller  : ''
+                        controller  : 'NewsDetailCtrl'
                     }
                 }
             })
@@ -591,8 +591,8 @@ angular.module('ionicApp', ['ionic'])
 
     }])
 
-.controller('NewsCtrl',['$scope', 'Data', '$location','$ionicModal','$ionicActionSheet', function($scope, Data, $location, $ionicModal,$ionicActionSheet){
-  /*  if(Data.news == null){
+.controller('NewsCtrl',['$scope', 'Data', '$state','$ionicModal','$ionicActionSheet', function($scope, Data, $state, $ionicModal,$ionicActionSheet){
+    if(Data.news == null){
         Data.getNews().success(function(data){
             $scope.allNews = data;
             Data.news = data;
@@ -604,19 +604,9 @@ angular.module('ionicApp', ['ionic'])
 
     $scope.getNews = function(news){
         Data.selectedNews = news;
-        $location.path('/happen/'+ news.Id);
+        $state.go('tabs.news');
 
-    }*/
-        console.log('i am here');
-        $ionicModal.fromTemplateUrl('modal.html', function (modal) {
-            $scope.modal = modal;
-        }, {
-            animation: 'slide-in-up',
-            focusFirstInput: true
-        });
-
-
-
+    }
 
 }])
 
@@ -647,33 +637,10 @@ angular.module('ionicApp', ['ionic'])
     }
 }])
 
-.controller('NewsDetailCtrl',['$scope', 'Data', '$location', '$routeParams', '$sce', function($scope, Data, $location, $routeParams, $sce){
-    var getTemplate = function(){
-        Data.getNewsTemplate(Data.selectedNews.Id).success(function(data){
-            //  $scope.news.Template = data;
-            $scope.templateUrl = 'http://localhost/gidifarm-api/gidifarm-api/newsTemplate/' + Data.selectedNews.Id + '.html';
-            // $scope.news.Template = $sce.trustAsHtml('<label><b>Hello </b> <input type="text" value="world !"></label>');
-            console.log(data);
-        });
-    }
+.controller('NewsDetailCtrl',['$scope', 'Data',  '$sce', function($scope, Data, $sce){
 
-    if(Data.selectedNews == null)
-    {
-        Data.getNewsById($routeParams.id).success(function(data){
-            $scope.news = data[0];
-            Data.selectedNews = data[0];
-            console.log(data);
-            $scope.template = 'http://localhost/gidifarm-api/gidifarm-api/newsTemplate/' + Data.selectedNews.Id + '.html';
-            // getTemplate();
-        })
-    }
-    else{
-        $scope.news = Data.selectedNews;
-        $scope.template = 'http://localhost/gidifarm-api/gidifarm-api/newsTemplate/' + Data.selectedNews.Id + '.html';
-        // getTemplate();
-    }
-
-
+            $scope.news = Data.selectedNews;
+            $scope.template = $sce.trustAsHtml('http://gidifarm-admin.azurewebsites.net//gidifarm-api/newsTemplate/' + Data.selectedNews.Id + '.html');
 }])
 
 .controller('ContactCtrl',['$scope', 'Data' , function($scope, Data){
@@ -684,20 +651,12 @@ angular.module('ionicApp', ['ionic'])
     }
 }])
 
-.controller('ProductCtrl',['$scope', 'Data', 'shoppingCart', '$routeParams', '$location' , function($scope, Data, shoppingCart, $routeParams, $location){
+.controller('ProductCtrl',['$scope', 'Data', 'shoppingCart' , function($scope, Data, shoppingCart){
 
     $scope.product = {};
-    if(Data.selectedMProduct == null || $routeParams.id != Data.selectedMProduct.Id){
-        Data.getMProduct($routeParams.id).success(function(data){
-            console.log(data);
-            data == "null" ? Data.selectedMProduct = null : Data.selectedMProduct = data[0];
-            if(Data.selectedMProduct != null) Data.selectedMProduct.Product = Data.selectedMProduct.Name;
-            $scope.product = Data.selectedMProduct;
-        });
-    }
-    else{
-        $scope.product = Data.selectedMProduct;
-    }
+
+    $scope.product = Data.selectedMProduct;
+        console.log($scope.product);
 
 
     $scope.cart = shoppingCart;
@@ -782,7 +741,7 @@ angular.module('ionicApp', ['ionic'])
 
     }])
 
-.controller('MarketCtrl', ['$scope', 'Data', '$rootScope', '$location', function($scope, Data, $rootScope, $location){
+.controller('MarketCtrl', ['$scope', 'Data', '$rootScope', '$state', function($scope, Data, $rootScope, $state){
 
         (function(){
             if(Data.marketProducts == null){
@@ -817,8 +776,7 @@ angular.module('ionicApp', ['ionic'])
 
     $scope.details = function(prod){
         Data.selectedMProduct = prod;
-        //  console.log(prod);
-        $location.path('/product/' + prod.Id);
+        $state.go('tabs.product');
     };
 
 }])

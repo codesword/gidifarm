@@ -9,7 +9,8 @@
 
     <link href="css/ionic.min.css" rel="stylesheet">
     <link href="css/index.css" rel="stylesheet">
-
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
     <script src="js/ionic.bundle.min.js"></script>
     <script src="js/shoppingCart.js"></script>
     <script src="js/app.js"></script>
@@ -84,6 +85,10 @@
             text-align:center;
             border:thin gray solid;
         }
+
+       .home-text {
+           color: #ffffff;
+       }
 
     </style>
 
@@ -184,8 +189,59 @@
     </ion-view>
 </script>
 
+<script id="home.html" type="text/ng-template">
+    <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+    <ion-view title="Home">
+        <ion-content padding="true">
+            <section class="section home">
+                <div class="">
+                    <div class="container" style="margin: 0 auto">
 
+                        <div class="tile tile-item tile-portfolio">
+                            <a class="ascensorLink ascensorLink1 tile-nav" href="#/tab/price/home">
+                                <h5 class="h5 home-text">Agro Price</h5>
+                                <i class="icon ion-pricetags fa-4x"></i>
+                            </a>
+                        </div>
+                        <div class="tile tile-item tile-about">
+                            <a class="ascensorLink ascensorLink2 tile-nav" href="#/tab/market/home">
+                                <h5 class="h5 home-text">Agro Market</h5>
+                                <i class="icon ion-ios7-cart fa-4x"></i>
+                            </a>
+                        </div>
+                        <div class="tile tile-item tile-service">
+                            <a class="ascensorLink ascensorLink3 tile-nav" href="#/tab/news-list">
+                                <h5 class="h5 home-text">Agro News</h5>
+                                <i class="icon ion-ios7-at fa-4x"></i>
+                            </a>
+                        </div>
+                        <div class="tile tile-item tile-team">
+                            <a class="ascensorLink ascensorLink4 tile-nav" href="#/tab/market-perf">
+                                <h5 class="h5 home-text">Market Performance</h5>
+                                <i class="icon ion-stats-bars fa-4x"></i>
+                            </a>
+                        </div>
+                        <div class="tile tile-item tile-client">
+                            <a class="ascensorLink ascensorLink5 tile-nav" href="#/tab/download">
+                                <h5 class="h5 home-text">Download</h5>
+                                <i class="icon ion-archive fa-4x"></i>
+                            </a>
+                        </div>
+                        <div class="tile tile-item tile-blog">
+                            <a class="ascensorLink ascensorLink6 tile-nav" href="#/tab/about">
+                                <h5 class="h5 home-text">About</h5>
+                                <i class="icon ion-ios7-heart fa-4x"></i>
+                            </a>
+                        </div>
 
+                    </div>
+                </div>
+            </section> <!-- /home -->
+        </ion-content>
+    </ion-view>
+</script>
+
+<!--
 <script id="home.html" type="text/ng-template">
     <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
     <ion-view title="Home">
@@ -236,21 +292,19 @@
                         </div>
                     </a>
                 </div>
-                
-                <div class="col col-50 box"  style="">
-                    <a href="#/tab/about" >
+
+                <a href="#/tab/about" class="col col-50 box"  style="">
                         <div class="box-home" style="width: 70%; margin: 0 auto;">
                             <img class="box-inner" style="width: 100%" src="img/about.jpg" >
                         </div>
-                    </a>
-                </div>
+                </a>
 
             </div>
 
 
         </ion-content>
     </ion-view>
-</script>
+</script>-->
 
 <script id="account-menu.html" type="text/ng-template">
     <ion-side-menus>
@@ -781,9 +835,13 @@
         <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
         <ion-content>
             <div class="list">
-                <div class="item item-text-wrap" href="#/tab/news">
+                <div class="item item-text-wrap">
                     <span>Gidifarm Profile</span>
-                   <a href="#"> <span class="badge badge-assertive">download</span></a>
+                   <a href="http://www.gidifarm.com/pdf/Our%20Profile.pdf"> <span class="badge badge-assertive">download</span></a>
+                </div>
+                <div class="item item-text-wrap">
+                    <span>Bank Of Agriculture</span>
+                    <a href="http://www.gidifarm.com/pdf/boa.pdf"> <span class="badge badge-assertive">download</span></a>
                 </div>
                 <div class="padding">
                     <a href="#/tab/price/download" class="button button-block button-light">Click Here To Download Market Price Data</a>
@@ -799,11 +857,11 @@
     <ion-view title="Agro News">
         <ion-content>
             <div class="list">
-                <a class="item item-text-wrap"  ng-click="showActionSheet()">
-                   <span>AGRIC MINISTER VISITS FISHING COMPANIES</span>
+                <a class="item item-text-wrap" ng-repeat="news in allNews" ng-click="getNews(news)">
+                   <h3 style="font-weight: bold">{{ news.Title }}</h3>
+                    <span class="item-note">{{ news.PostedDate }}</span>
                 </a>
             </div>
-            <Button  ng-click="show()">Click</Button>
         </ion-content>
     </ion-view>
 </script>
@@ -838,18 +896,19 @@
 
 <script id="news.html" type="text/ng-template">
     <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
-    <ion-view title="AGRIC MINISTER VISITS FISHING COMPANIES" >
+    <ion-view title="{{ news.Title }}" >
         <ion-content>
+            <ion-scroll>
             <div class="list card">
                 <div class="item item-text-wrap">
-                <h2>AGRIC MINISTER VISITS FISHING COMPANIES</h2>
+                <h2 style="font-weight: bold">{{ news.Title }}</h2>
             </div>
                 <div class="item item-text-wrap">
-                    <p>Posted On <span class="badge badge-assertive" style="float: right">12/3/2014</span></p>
+                    <p>Posted On <span class="badge badge-assertive" style="float: right">{{ news.PostedDate }}</span></p>
                 </div>
 
                 <div class="item item-body">
-                    <img class="full-image" src="delorean.jpg">
+                    <div style="text-align: justify"  ng-include="template"></div>
                 </div>
 
 
@@ -860,6 +919,7 @@
                     </a>
                 </div>
             </div>
+                </ion-scroll>
         </ion-content>
     </ion-view>
 </script>
@@ -868,7 +928,7 @@
     <ion-view title="Agro Market">
         <ion-content>
            <div class="list">
-               <a class="item " ng-href="'#/tab/product/'product.Id" ng-repeat="product in products | orderBy:'name'">
+               <a class="item " ng-repeat="product in products | orderBy:'name'" ng-click="details(product)">
                    {{ product.Name }} | {{ product.Quantity }} {{ product.Measure }}
                      <span class="item-note">{{ product.Price | nairacurrency}}</span>
                </a>
@@ -879,16 +939,20 @@
 
 <script id="product.html" type="text/ng-template">
     <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
-    <ion-view title="Rice">
+    <ion-view title="{{ product.Name }}">
         <ion-content>
+            <ion-scroll>
             <div class="list card">
                 <div class="item item-text-wrap">
-                    <h2>Unit Price<span style="float: right">N12,000</span></h2>
-                    <p> Quantity Available<span style="float: right">5 Bags</span></p>
+                    <h2>Unit Price<span style="float: right">{{ product.Price }}</span></h2>
+                    <p> Quantity Available<span style="float: right">{{ product.Quantity }} {{ product.Measure }}</span></p>
                 </div>
+                <div class="item item-text-wrap">
 
+                    <p>{{ product.Description }}</p>
+                </div>
                 <div class="item item-image">
-                    <img class="full-image" src="delorean.jpg">
+                    <img class="full-image" ng-src="product.image">
                 </div>
 
                 <div class="item item-input-inset">
@@ -915,6 +979,7 @@
                     </a>
                 </div>
             </div>
+            </ion-scroll>
         </ion-content>
     </ion-view>
 </script>
@@ -1202,55 +1267,58 @@
                     <div class="bar bar-subheader">
                         <h2 class="title">Meet The Team</h2>
                     </div>
-                    <div class="list card" style="margin-top: 100px">
-                        <div class="item item-avatar">
-                            <img src="img/ikem.jpg">
-                            <h2>IKEM OKONKWO</h2>
-                            <p>Chief Technology Officer</p>
+                    <ion-scroll>
+                        <div class="list card" style="margin-top: 100px">
+                            <div class="item item-avatar">
+                                <img src="img/ikem.jpg">
+                                <h2>IKEM OKONKWO</h2>
+                                <p>Chief Technology Officer</p>
+                            </div>
+
+                            <div class="item item-image">
+                                <img src="img/ikem.jpg">
+                            </div>
+
+                            <div class="item tabs  tabs-icon-top">
+                                <a class="tab-item" href="http://facebook.com/dyoungikem" title="facebook">
+                                    <i class="icon ion-social-facebook "></i>
+                                </a>
+                                <a class="tab-item" href="http://twitter.com/dyoungikem" title="twitter">
+                                    <i class="icon ion-social-twitter"></i>
+                                </a>
+                                <a class="tab-item" href="https://plus.google.com/u/0/108794339732723092309" title="google plus">
+                                    <i class="icon ion-social-googleplus"></i>
+                                </a>
+                            </div>
+
                         </div>
 
-                        <div class="item item-image">
-                            <img src="img/ikem.jpg">
+                        <div class="list card">
+                            <div class="item item-avatar">
+                                <img src="img/boye.jpg">
+                                <h2>SALISU BOYE</h2>
+                                <p>Chief Operation Officer</p>
+                            </div>
+
+                            <div class="item item-image">
+                                <img src="img/boye.jpg">
+                            </div>
+
+                            <div class="item tabs  tabs-icon-top">
+                                <a class="tab-item" href="http://facebook.com/boye.salisu" title="facebook">
+                                    <i class="icon ion-social-facebook "></i>
+                                </a>
+                                <a class="tab-item" href="http://twitter.com/boye0" title="twitter">
+                                    <i class="icon ion-social-twitter"></i>
+                                </a>
+                                <a class="tab-item" href="" title="google plus">
+                                    <i class="icon ion-social-googleplus"></i>
+                                </a>
+                            </div>
+
                         </div>
+                    </ion-scroll>
 
-                        <div class="item tabs  tabs-icon-top">
-                            <a class="tab-item" href="http://facebook.com/dyoungikem" title="facebook">
-                                <i class="icon ion-social-facebook "></i>
-                            </a>
-                            <a class="tab-item" href="http://twitter.com/dyoungikem" title="twitter">
-                                <i class="icon ion-social-twitter"></i>
-                            </a>
-                            <a class="tab-item" href="https://plus.google.com/u/0/108794339732723092309" title="google plus">
-                                <i class="icon ion-social-googleplus"></i>
-                            </a>
-                        </div>
-
-                    </div>
-
-                    <div class="list card">
-                        <div class="item item-avatar">
-                            <img src="img/boye.jpg">
-                            <h2>SALISU BOYE</h2>
-                            <p>Chief Operation Officer</p>
-                        </div>
-
-                        <div class="item item-image">
-                            <img src="img/boye.jpg">
-                        </div>
-
-                        <div class="item tabs  tabs-icon-top">
-                            <a class="tab-item" href="http://facebook.com/boye.salisu" title="facebook">
-                                <i class="icon ion-social-facebook "></i>
-                            </a>
-                            <a class="tab-item" href="http://twitter.com/boye0" title="twitter">
-                                <i class="icon ion-social-twitter"></i>
-                            </a>
-                            <a class="tab-item" href="" title="google plus">
-                                <i class="icon ion-social-googleplus"></i>
-                            </a>
-                        </div>
-
-                    </div>
 
 
                 </div>
