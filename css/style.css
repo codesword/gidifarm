@@ -219,15 +219,33 @@ a, a:hover {
 .tile-follow {
 	background: #3cf;
 }
-
+.tile .fa-3x {
+    font-size: 5em;
+}
 /* Media Query */
-@media (max-width:399px) {
+
+@media (max-width:319px) {
+
+    .tile .fa-4x {
+        font-size: 3em;
+    }
+    .tile {
+        width: 49%;
+    }
+    .tile .fa-3x {
+        font-size: 0em;
+    }
+}
+@media (max-width:399px) and (min-width: 320px) {
 
     .tile .fa-4x {
         font-size: 4em;
     }
     .tile {
         width: 49%;
+    }
+    .tile .fa-3x {
+        font-size: 3em;
     }
 }
 
@@ -243,6 +261,10 @@ a, a:hover {
         font-size: 6em;
     }
 
+    .tile .fa-3x {
+        font-size: 5em;
+    }
+
 }
 
 @media (max-width:768px) and  (min-width: 481px){
@@ -252,7 +274,9 @@ a, a:hover {
     .tile .fa-4x {
         font-size: 8em;
     }
-
+    .tile .fa-3x {
+        font-size: 6em;
+    }
   .home .container {
         max-width: 600px;
         padding-bottom: 0;

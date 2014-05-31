@@ -9,10 +9,11 @@
 
     <link href="css/ionic.min.css" rel="stylesheet">
     <link href="css/index.css" rel="stylesheet">
-    <link href="css/font-awesome.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
     <script src="js/ionic.bundle.min.js"></script>
     <script src="js/shoppingCart.js"></script>
+    <script src="js/sha256.js"></script>
     <script src="js/app.js"></script>
     <style>
         body {
@@ -111,20 +112,20 @@
         <ion-content padding="true">
                     <div class="list col-center">
                         <label class="item item-input">
-                            <span class="input-label">Username</span>
-                            <input type="text" ng-model="user.username">
+                            <span class="input-label">Email</span>
+                            <input type="text" ng-model="user.Username">
                         </label>
                         <label class="item item-input">
                             <span class="input-label">Password</span>
-                            <input type="password" ng-model="user.password">
+                            <input type="password" ng-model="user.Password">
                         </label>
                     </div>
                     <div>
-                        <button class="button button-block button-positive" ng-click="signIn(user)">
+                        <button class="button button-block button-positive" ng-click="login(user)">
                             Sign-In
                         </button>
                         <p class="text-center">
-                            <a href="#/forgot-password">Forgot password</a> Or Register <a href="#/register">Here</a>
+                            Have no account? Register <a href="#/register">Here</a>
                         </p>
                     </div>
 
@@ -238,6 +239,84 @@
                 </div>
             </section> <!-- /home -->
         </ion-content>
+    </ion-view>
+</script>
+
+<script id="market-perf.html" type="text/ng-template">
+    <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
+
+        <ion-nav-buttons side="left">
+            <button class="button button-positive  no-animation"
+                    ng-click="previous()" ng-if="slideIndex > 0">
+                <i class="icon ion-ios7-arrow-left"></i>
+                Top Gainers
+            </button>
+        </ion-nav-buttons>
+        <ion-nav-buttons side="right">
+            <button class="button button-positive no-animation"
+                    ng-click="next()" ng-if="slideIndex != 1">
+                Top Losers
+                <i class="icon ion-ios7-arrow-right"></i>
+            </button>
+        </ion-nav-buttons>
+    <ion-view title="Market Performance">
+        <ion-slide-box show-pager="false"  on-slide-changed="slideChanged(index)">
+                <ion-slide>
+                    <div class="padding">
+                        <div class="bar bar-subheader">
+                            <h2 class="title">Top Gainers</h2>
+                        </div>
+                        <div  style="margin-top: 100px">
+                    <div class="list" ng-repeat="item in mperf.Gainers">
+                            <div class="item item-divider item-icon-right">
+                                {{ item.Name }}
+                            </div>
+                            <div class="item" style="text-align: center">
+                                {{ item.Market }} Market In {{ item.State }} State
+                            </div>
+                            <div class="item item-icon-left">
+                                <i class="icon ion-ios7-pricetag" ng-click="close()"></i>
+                                Price Of  {{ item.Units }}
+                                <span class="badge badge-light"> {{ item.Price | nairacurrency}}</span>
+                            </div>
+                            <div class="item item-icon-left">
+                                <i class="icon ion-ios7-star" ng-click="close()"></i>
+                                Change in Price (%)
+                                <span class="badge badge-light"> {{ item.Change}}</span>
+                            </div>
+                        </div>
+                            </div>
+                    </div>
+                </ion-slide>
+
+                <ion-slide>
+                    <div class="padding">
+                        <div class="bar bar-subheader">
+                            <h2 class="title">Top Losers</h2>
+                        </div>
+                        <div  style="margin-top: 100px">
+                    <div class="list" ng-repeat="item in mperf.Losers">
+                            <div class="item item-divider item-icon-right">
+                                {{ item.Name }}
+                            </div>
+                            <div class="item" style="text-align: center">
+                                {{ item.Market }} Market In {{ item.State }} State
+                            </div>
+                            <div class="item item-icon-left">
+                                <i class="icon ion-ios7-pricetag" ng-click="close()"></i>
+                                Price Of  {{ item.Units }}
+                                <span class="badge badge-light"> {{ item.Price | nairacurrency}}</span>
+                            </div>
+                            <div class="item item-icon-left">
+                                <i class="icon ion-ios7-star" ng-click="close()"></i>
+                                Change in Price (%)
+                                <span class="badge badge-light"> {{ item.Change}}</span>
+                            </div>
+                        </div>
+                            </div>
+                    </div>
+                </ion-slide>
+              </ion-slide-box>
     </ion-view>
 </script>
 
@@ -463,69 +542,42 @@
 <script id="dashboard.html" type="text/ng-template">
     <ion-view title="Dashboard">
         <ion-content>
-            <div class="row">
-                <div class="col col-offset-20 col-60 box" >
-                    <a href="#">
-                        <div class="box-wrap">
-                            <div class="box-inner" style="background-color: red;">
-                                <div class="" style="margin-top: 5vw">
-                                <span style="font-size: 5vw; margin-bottom: 2vw" >{{ 5 }}</span> <br>
-                                <div style="font-size: 3.5vw;">Produce Posted</div>
-                            </div>
-                            </div>
+            <section class="section home">
+                <div class="center-box">
+                    <div class="container" style="margin: 0 auto">
+                        <div class="tile tile-item tile-contact">
+                            <a class="ascensorLink ascensorLink7 tile-nav" href="#/tab/account/my-produce">
+                                <h5 class="h5">
+                                    {{ CultivatedNo }} Farm Produce Dealing With
+                                </h5>
+                                <i class="icon ion-disc fa-3x"></i>
+                            </a>
                         </div>
-                    </a>
-                </div>
-                <div class="col col-20" ></div>
-            </div>
+                        <div class="tile tile-item tile-follow">
+                            <a class="ascensorLink ascensorLink8 tile-nav" href="#/tab/account/carts">
+                                <h5 class="h5">{{ CartNo }} Products In Your Shopping Cart</h5>
+                                <i class="icon ion-ios7-cart fa-3x"></i>
+                            </a>
+                        </div>
 
-            <div class="row">
-                <div class="col col-offset-20 col-60 box" >
-                    <a href="#">
-                        <div class="box-wrap">
-                            <div class="box-inner" style="background-color: orange;">
-                                <div class="" style="margin-top: 5vw">
-                                    <span style="font-size: 5vw; margin-bottom: 2vw" >{{ 5 }}</span> <br>
-                                    <div style="font-size: 3.5vw;">Orders Made</div>
-                                </div>
-                            </div>
+                        <div class="tile tile-item tile-client">
+                            <a class="ascensorLink ascensorLink5 tile-nav" href="#/tab/account/orders">
+                                <h5 class="h5">{{ OrderNo }} Orders Made</h5>
+                                <i class="icon ion-thumbsup fa-3x"></i>
+                            </a>
                         </div>
-                    </a>
-                </div>
-                <div class="col col-20" ></div>
-            </div>
+                        <div class="tile tile-item tile-blog">
+                            <a class="ascensorLink ascensorLink6 tile-nav" href="#/tab/account/produce-posted">
+                                <h5 class="h5">{{ PostedNo }} Produce Added</h5>
+                                <i class="icon ion-android-add fa-3x"></i>
+                            </a>
+                        </div>
 
-            <div class="row">
-                <div class="col col-offset-20 col-60 box" >
-                    <a href="#">
-                        <div class="box-wrap">
-                            <div class="box-inner" style="background-color: green;">
-                                <div class="" style="margin-top: 5vw">
-                                    <span style="font-size: 5vw;" >{{ 5 }}</span> <br>
-                                    <div style="font-size: 3.5vw;">Produce Dealing With</div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col col-20" ></div>
-            </div>
 
-            <div class="row">
-                <div class="col col-offset-20 col-60 box" >
-                    <a href="#">
-                        <div class="box-wrap">
-                            <div class="box-inner" style="background-color: blue;">
-                                <div class="" style="margin-top: 5vw">
-                                    <span style="font-size: 5vw; margin-bottom: 2vw" >{{ 5 }}</span> <br>
-                                    <div style="font-size: 3.5vw;">Produce In Your Shopping Cart</div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
+                    </div>
                 </div>
-                <div class="col col-20" ></div>
-            </div>
+            </section> <!-- /home -->
+
         </ion-content>
     </ion-view>
 </script>
@@ -535,16 +587,10 @@
     <ion-view title="My Produce">
         <ion-content padding="true">
             <h4>Click on Each Item Below to Add It To Your List</h4>
-            <a href="#"><span class="badge badge-positive">Rice</span></a>
-            <a href="#"><span class="badge badge-positive">Beans</span></a>
-                <a href="#"><span class="badge badge-positive">Cassava</span></a>
-                    <a href="#"><span class="badge badge-positive">Garri</span></a>
+            <a href="" ng-repeat="prod in products" ng-click="addCrop(prod)"><span class="badge badge-positive">{{ prod.Name }}</span></a>
             <hr>
             <h4>Click on Each Item Below to Remove It From Your List</h4>
-                        <a href="#"><span class="badge badge-balanced">Rice</span></a>
-                            <a href="#"><span class="badge badge-balanced">Beans</span></a>
-                                <a href="#"><span class="badge badge-balanced">Cassava</span></a>
-                                    <a href="#"> <span class="badge badge-balanced">Garri</span></a>
+                        <a href="" ng-repeat="prod in cultivatedProducts" ng-click="removeCrop(prod, $index)"><span class="badge badge-balanced">{{ prod.Name }}</span></a>
         </ion-content>
     </ion-view>
 </script>
@@ -558,10 +604,10 @@
     <a href="#/tab/account/new-produce" class="button button-positive button-block">Add New Produce</a>
 </div>
             <div class="list">
-                <a class="item item-text-wrap" href="#">
-                    <span>Rice @ N5,000 | Bag</span>
-                    <span class="badge badge-assertive">12/5/2014</span>
-                </a>
+                <div class="item item-text-wrap" ng-repeat="prod in products">
+                    <span>{{ prod.Name }} @ {{ prod.Price }} | {{ prod.Measure }}</span>
+                    <span class="badge badge-assertive">{{ prod.PostedDate }}</span>
+                </div>>
             </div>
         </ion-content>
     </ion-view>
@@ -621,31 +667,31 @@
 
         <ion-content>
 
-           <!-- <div class="list">
-                <a class="item item-text-wrap" ng-click="show()">
-                   <span style="font-size: 3.5vw">Id | 347 Total-Quantity | 5    Total-Price | N25,000</span>
-                        <h2 style="font-size: 3.5vw;white-space: normal">Order ID       : 243</h2>
-                        <h4 style="font-size: 3.0vw">Total Quantity : 5</h4>
-                        <h4 style="font-size: 3.0vw">Total Price    : N3,565</h4>
+            <table id="box-table-b">
 
-                    <span class="badge badge-assertive">12/5/2014</span>
-                </a>
+                <!-- Table header -->
 
-            </div>-->
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Quantities</th>
+                    <th>Amount</th>
+                    <th>Order Date</th>
+                </tr>
+                </thead>
 
-            <div class="row">
-                <div class="col col-head"><h3>ID</h3></div>
-                <div class="col col-head"><h3>Total Quantity</h3></div>
-                <div class="col col-head"><h3>Total Price</h3></div>
-            </div>
-            <div class="row" ng-click="show()">
-                <div class="col col-body"><h3>7</h3></div>
-                <div class="col col-body"><h3>25</h3></div>
-                <div class="col col-body"><h3>N4,935</h3></div>
-            </div>
+                <!-- Table body -->
 
+                <tbody>
+                <tr ng-repeat="o in orders" ng-click="show(o)" >
+                    <td>{{ o.Id }}</td>
+                    <td>{{ o.Quantity }}</td>
+                    <td>{{ o.Price }}</td>
+                    <td>{{ o.OrderDate }}</td>
+                </tr>
+                </tbody>
 
-
+            </table>
         </ion-content>
     </ion-view>
 </script>
@@ -654,7 +700,7 @@
     <div class="modal" ng-controller="OrderDetailsCtrl">
         <ion-header-bar class="bar bar-header bar-balanced">
             <h1 class="title">Order 1 {{ id }}</h1>
-            <i class="button icon ion-close" ng-click="close()"></i>
+            <i class="button icon ion-close button-positive" ng-click="modal.hide()"></i>
         </ion-header-bar>
         <ion-content>
 
@@ -697,7 +743,10 @@
                     </div>
 
                 </div>
-                <a class="button button-block button-assertive">Delete</a>
+                <div class="button-bar padding">
+                    <a class="button button-assertive" ng-click="delete()">DELETE</a>
+                    <a class="button button-positive" ng-click="modal.hide()">CANCEL</a>
+                </div>
             </div>
 
 
@@ -772,19 +821,19 @@
             <div class="list">
                 <label class="item item-input">
                     <span class="input-label">Name</span>
-                    <input type="text">
+                    <input type="text" ng-model="cust.Name">
                 </label>
                 <label class="item item-input">
                     <span class="input-label">Email</span>
-                    <input type="email">
+                    <input type="email" ng-model="cust.Email">
                 </label>
                 <label class="item item-input">
                     <span class="input-label">phone</span>
-                    <input type="number">
+                    <input type="number" ng-model="cust.Phone">
                 </label>
 
                 <label class="item item-input item-select">
-                <div class="input-label">
+                <div class="input-label" ng-model="cust.Gender">
                     Gender
                 </div>
                 <select>
@@ -796,8 +845,8 @@
                     <div class="input-label">
                         Category
                     </div>
-                    <select>
-                        <option selected>Farmer</option>
+                    <select ng-model="cust.Category">
+                        <option>Farmer</option>
                         <option>StalkHolder</option>
                         <option>Business Men</option>
                     </select>
@@ -805,25 +854,27 @@
 
                 <label class="item item-input">
                     <span class="input-label">State</span>
-                    <input type="text">
+                    <select ng-model="cust.State"
+                            ng-options="state.Name as state.Name for state in states">
+                    </select>
                 </label>
 
                 <label class="item item-input">
                     <span class="input-label">LGA</span>
-                    <input type="text">
+                    <input type="text" ng-model="cust.LGA">
                 </label>
 
                 <label class="item item-input">
                     <span class="input-label">Village/City</span>
-                    <input type="text">
+                    <input type="text" ng-model="cust.Village">
                 </label>
 
                 <label class="item item-input">
                     <span class="input-label">Street Address</span>
-                    <input type="text">
+                    <input type="text" ng-model="cust.Address">
                 </label>
 
-                <button class="button button-block button-positive">Summit</button>
+                <button class="button button-block button-positive" ng-click="save()">Summit</button>
             </div>
         </ion-content>
     </ion-view>
@@ -837,11 +888,11 @@
             <div class="list">
                 <div class="item item-text-wrap">
                     <span>Gidifarm Profile</span>
-                   <a href="http://www.gidifarm.com/pdf/Our%20Profile.pdf"> <span class="badge badge-assertive">download</span></a>
+                    <span class="badge badge-assertive"><a href="http://www.gidifarm.com/pdf/Our%20Profile.pdf">download</a></span>
                 </div>
                 <div class="item item-text-wrap">
                     <span>Bank Of Agriculture</span>
-                    <a href="http://www.gidifarm.com/pdf/boa.pdf"> <span class="badge badge-assertive">download</span></a>
+                    <span class="badge badge-assertive"><a href="http://www.gidifarm.com/pdf/boa.pdf">download</a></span>
                 </div>
                 <div class="padding">
                     <a href="#/tab/price/download" class="button button-block button-light">Click Here To Download Market Price Data</a>
@@ -944,7 +995,7 @@
             <ion-scroll>
             <div class="list card">
                 <div class="item item-text-wrap">
-                    <h2>Unit Price<span style="float: right">{{ product.Price }}</span></h2>
+                    <h2>Unit Price<span style="float: right">{{ product.Price | nairacurrency }}</span></h2>
                     <p> Quantity Available<span style="float: right">{{ product.Quantity }} {{ product.Measure }}</span></p>
                 </div>
                 <div class="item item-text-wrap">
@@ -1066,48 +1117,17 @@
 <script id="download-price.html" type="text/ng-template">
     <ion-view title="Download Price Data">
         <ion-content>
-            <div class="list">
-                <label class="item item-input item-select">
-                    <div class="input-label">
-                        Select Year
-                    </div>
-                    <select>
-                        <option selected>2014</option>
-                        <option >2013</option>
-                    </select>
-                </label>
-
-                <label class="item item-input item-select">
-                    <div class="input-label">
-                        Select Format
-                    </div>
-                    <select>
-                        <option selected>Pdf</option>
-                        <option >Doc</option>
-                        <option>Csv</option>
-                    </select>
-                </label>
-
-                <label class="item item-input item-select">
-                    <div class="input-label">
-                        Select State
-                    </div>
-                    <select>
-                        <option selected>Lagos</option>
-                        <option >Osun</option>
-                        <option>Cross River</option>
-                    </select>
-                </label>
-                <button class="button button-block button-positive">Summit</button>
-
-                    <div class="item item-divider">
-                       Lagos January Week 1 Report
-                    </div>
+            <div class="list padding">
 
                     <div class="item">
-                        <a href="http://www.gidifarm.com/pdf/GFJwk1y14.pdf">download</a>
+                       Lagos January Week 1 Report
+                        <span class="badge badge-balanced"> <a href="http://www.gidifarm.com/pdf/GFJwk1y14.pdf">download</a></span>
                     </div>
 
+                <div class="item" ng-repeat="download in downloads">
+                    {{ download.Name }}
+                    <span class="badge badge-balanced"> <a href="{{ download.Url }}">download</a></span>
+                </div>
 
                     <div class="item item-divider">
                   Lagos January Week 2 Report
@@ -1191,9 +1211,9 @@
 
                 <div class="padding">
                     <div class="bar bar-subheader">
-                        <h2 class="title">Who We Are</h2>
+                        <h2 class="title" style="font-weight: bold">Who We Are</h2>
                     </div>
-                    <div style="margin-top: 100px; font-size: 1.5em; font-family: sans-serif; font-weight: 600; line-height: 1.5em">
+                    <div style="margin-top: 100px; font-size: 1em; font-family: sans-serif; font-weight: 600; line-height: 1.5em">
                         <p>
                         We are of a team of talented, Smart, Energic, Innovative youth that share the same goal and
                         love to make impact in any environment we find our self in.
@@ -1214,9 +1234,9 @@
             <ion-slide>
                 <div class="padding">
                     <div class="bar bar-subheader">
-                        <h2 class="title">What We Do</h2>
+                        <h2 class="title" style="font-weight: bold">What We Do</h2>
                     </div>
-                    <div style="margin-top: 100px; font-size: 1.5em; font-family: sans-serif; font-weight: 600; line-height: 1.5em">
+                    <div style="margin-top: 100px; font-size: 1em; font-family: sans-serif; font-weight: 600; line-height: 1.5em">
                         <p>
                             Enable farmers and consumer of agro-products to inquire
                             current market prices of different agro-products from different states and /or specific markets
@@ -1240,9 +1260,9 @@
             <ion-slide>
                 <div class="padding">
                     <div class="bar bar-subheader">
-                        <h2 class="title">How We Do It</h2>
+                        <h2 class="title" style="font-weight: bold">How We Do It</h2>
                     </div>
-                    <div style="margin-top: 100px; font-size: 1.5em; font-family: sans-serif; font-weight: 600; line-height: 1.5em">
+                    <div style="margin-top: 100px; font-size: 1em; font-family: sans-serif; font-weight: 600; line-height: 1.5em">
                         <p><h3 style="text-align: center">Web Sites</h3>
                             Our Services is a
                         </p>
@@ -1327,24 +1347,6 @@
     </ion-view>
 </script>
 
-<script id="abouts.html" type="text/ng-template">
-            <ion-slide-box show-pager="true">
-                <ion-slide>
-                    <view>
-                        <content padding="true" has-header="true">
-                            <h1>Page 1</h1>
-                        </content>
-                    </view>
-                </ion-slide>
-                <ion-slide>
-                    <div class="box yellow"><h1>YELLOW</h1></div>
-                </ion-slide>
-                <ion-slide>
-                    <div class="box pink"><h1>PINK</h1></div>
-                </ion-slide>
-            </ion-slide-box>
-
-</script>
 
 <script id="tabs.html" type="text/ng-template">
     <ion-tabs class="tabs-icon-top tabs-balanced">
@@ -1353,11 +1355,13 @@
             <ion-nav-view name="home-tab"></ion-nav-view>
         </ion-tab>
 
-        <ion-tab title="Account" icon="ion-ios7-information" href="#/tab/account/dashboard">
+        <ion-tab title="Account" icon="ion-ios7-information" ng-click="goAccount()">
             <ion-nav-view name="account-tab"></ion-nav-view>
         </ion-tab>
 
-        <ion-tab title="Sign-Out" icon="ion-log-out" href="#/sign-in">
+        <ion-tab title="Sign-In" icon="ion-log-in" ng-if="!loggedIn" href="#/sign-in">
+        </ion-tab>
+        <ion-tab title="Sign-Out" icon="ion-log-out" ng-if="loggedIn" ng-click="logout()">
         </ion-tab>
 
     </ion-tabs>

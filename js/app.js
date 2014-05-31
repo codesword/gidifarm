@@ -6,7 +6,7 @@ angular.module('ionicApp', ['ionic'])
             .state('signin', {
                 url: "/sign-in",
                 templateUrl: "sign-in.html",
-                controller: 'SignInCtrl'
+                controller: 'LoginCtrl'
             })
             .state('forgotpassword', {
                 url: "/forgot-password",
@@ -21,7 +21,8 @@ angular.module('ionicApp', ['ionic'])
             .state('tabs', {
                 url: "/tab",
                 abstract: true,
-                templateUrl: "tabs.html"
+                templateUrl: "tabs.html",
+                controller :  'LoginCtrl'
             })
             .state('tabs.home', {
                 url: "/home",
@@ -133,7 +134,15 @@ angular.module('ionicApp', ['ionic'])
                     }
                 }
             })
-
+            .state('tabs.mperf', {
+                url: "/market-perf",
+                views: {
+                    'home-tab': {
+                        templateUrl: "market-perf.html",
+                        controller: 'MPerfCtrl'
+                    }
+                }
+            })
             .state('tabs.marketmenu.home', {
                 url: "/home",
                 views: {
@@ -293,38 +302,28 @@ angular.module('ionicApp', ['ionic'])
                 }
             })
 
-
-
-        $urlRouterProvider.otherwise("/sign-in");
+        $urlRouterProvider.otherwise("/tab/home");
 
     })
 
-    .controller('SignInCtrl', function($scope, $state) {
+.factory('Auth', function($http, $rootScope, $window, $state, Data){
+    var baseUrl = 'http://www.gidifarm.com/gidifarm-api/';
+    // ...
+    var user = {};
+    return {
+        login: function(user) {
+            return $http.post(baseUrl + 'customers/login', user);
+        },
 
-        $scope.signIn = function(user) {
-            console.log('Sign-In', user);
-            $state.go('tabs.home');
-        };
 
-    })
-
-    .controller('AboutCtrl', function($scope, $state, $ionicSlideBoxDelegate) {
-        $scope.next = function() {
-            $ionicSlideBoxDelegate.next();
-        };
-        $scope.previous = function() {
-            $ionicSlideBoxDelegate.previous();
-        };
-
-        // Called each time the slide changes
-        $scope.slideChanged = function(index) {
-            $scope.slideIndex = index;
-        };
-    })
-
-    .controller('HomeTabCtrl', function($scope) {
-        console.log('HomeTabCtrl');
-    })
+        logout: function() {
+            $http.post(baseUrl + 'customers/' + user.Id + '/logout').success(function(data){
+                $window['localStorage'].removeItem('customer');
+                $state.go('tabs.home');
+            });
+        }
+    };
+})
 
 
 .factory('Data', ['$http', function($http){
@@ -335,6 +334,7 @@ angular.module('ionicApp', ['ionic'])
         selectedState        : null,
         selectedMState       : null,
         commodities          : null,
+        mperf                : null,
         mCommodities         : null,
         marketCommodities    : null,
         selectedCommodity    : null,
@@ -347,6 +347,7 @@ angular.module('ionicApp', ['ionic'])
 
         currentUser                 : null,
         noOrders                    : null,
+        selectedOrder               : null,
         orders                      : null,
         noCultivated                : null,
         cultivatedProducts          : null,
@@ -361,6 +362,17 @@ angular.module('ionicApp', ['ionic'])
         settings                    : null,
         plantList                   : null,
         plant                       : null,
+        getQueryString      :function(obj, prefix){
+            var str = [];
+            for (var p in obj) {
+                var k = prefix ? prefix + "[" + p + "]" : p,
+                    v = obj[k];
+                str.push(angular.isObject(v) ? this.getQueryString(v, k) : (k) + "=" + encodeURIComponent(v));
+            }
+            return str.join("&");
+        },
+        getMPerf            : function(){
+            return $http.get(baseUrl + 'marketperf');},
         getStates            : function(){
             return $http.get(baseUrl + 'states');},
         getNewsTemplate      : function(id){
@@ -490,6 +502,23 @@ angular.module('ionicApp', ['ionic'])
             $ionicSideMenuDelegate.toggleLeft();
         };
     })
+    .controller('AboutCtrl', function($scope, $state, $ionicSlideBoxDelegate) {
+        $scope.next = function() {
+            $ionicSlideBoxDelegate.next();
+        };
+        $scope.previous = function() {
+            $ionicSlideBoxDelegate.previous();
+        };
+
+        // Called each time the slide changes
+        $scope.slideChanged = function(index) {
+            $scope.slideIndex = index;
+        };
+    })
+
+    .controller('HomeTabCtrl', function($scope) {
+        console.log('HomeTabCtrl');
+    })
 
 .controller('HomeTabCtrl', ['$scope', 'Data', function($scope, Data){
 
@@ -499,7 +528,38 @@ angular.module('ionicApp', ['ionic'])
 
     }])
 
-.controller('PriceCtrl', ['$scope', 'Data', function($scope, Data){
+    .controller('MPerfCtrl', ['$scope', 'Data','$ionicSlideBoxDelegate', function($scope, Data, $ionicSlideBoxDelegate){
+        if(Data.mperf == null){
+            Data.getMPerf().success(function(data){
+                Data.mperf = data;
+                $scope.mperf  = data
+            })
+        }
+        else {
+            $scope.mperf  = Data.mperf;
+        }
+        $scope.next = function() {
+            $ionicSlideBoxDelegate.next();
+        };
+        $scope.previous = function() {
+            $ionicSlideBoxDelegate.previous();
+        };
+
+        // Called each time the slide changes
+        $scope.slideChanged = function(index) {
+            $scope.slideIndex = index;
+        };
+        $scope.gainers = function(){
+            $scope.mperf  = Data.mperf.Gainers;
+        }
+
+        $scope.Losers = function(){
+            $scope.mperf  = Data.mperf.Losers;
+        }
+
+    }])
+
+    .controller('PriceCtrl', ['$scope', 'Data', function($scope, Data){
     $scope.noProduceDisplay = false;
         $scope.values = {};
         //$scope.commId = 0;
@@ -781,80 +841,41 @@ angular.module('ionicApp', ['ionic'])
 
 }])
 
-
-
-.factory('Auth', function($http, $rootScope, $window, $location, Data){
-    var baseUrl = 'http://localhost/gidifarm-api/gidifarm-api/';
-    // ...
-    var user = {};
-    return {
-        isLoggedIn: function() {
-
-            var result = false;
-            var u = $window['localStorage'].getItem('customer');
-            user = angular.fromJson(u);
-            Data.currentUser = user;
-            if(user != null)
-                result = user.loggedIn;
-            if(result)
-                $rootScope.$broadcast('loggedIn', true);
-            return result;
-        },
-        login: function(user) {
-            return $http.post(baseUrl + 'customers/login', user);
-        },
-
-        logout: function() {
-            $http.post(baseUrl + 'customers/' + user.Id + '/logout').success(function(data){
-                console.log(data);
-                $window['localStorage'].removeItem('customer');
-                Data.currentUser = null;
-                $rootScope.$broadcast('loggedOut', true);
-                $location.path('/login');
-            });
-        }
-    };
-})
-
-.controller('LoginCtrl',['Auth','$scope', '$window', '$location','$rootScope','Data', '$http',
-    function(Auth, $scope, $window, $location, $rootScope, Data, $http){
-        $scope.user = {};
-        $scope.loggedIn = Auth.isLoggedIn();
-        $rootScope.$on('loggedIn',function(val){
-            if(Data.currentUser != null){
-                $scope.user = Data.currentUser;
-            }
-
-            else{
-                Data.currentUser = angular.fromJson($window['localStorage'].getItem('CurrentUser'));
-                $scope.user = Data.currentUser;
-            }
-
-            $scope.loggedIn = true;
-            //  console.log($scope.user);
-        });
-
-        $rootScope.$on('loggedOut',function(val){
+.controller('LoginCtrl',['Auth','$scope', '$window', '$state','$rootScope','Data', '$http',
+    function(Auth, $scope, $window, $state, $rootScope, Data, $http){
+        if(Data.currentUser == null){
             $scope.loggedIn = false;
-        });
-        $scope.login = function(){
-            var user = angular.copy($scope.user,{});
+            $scope.user = Data.currentUser;
+        }
+        else $scope.loggedIn = true;
+
+        $scope.login = function(me){
+            var user = angular.copy(me,{});
             user.Password =  sha256_digest(user.Password);
-            Auth.login(user).success(function(data){
+            var query = "";
+            query = Data.getQueryString(user);
+            console.log(query);
+            Auth.login(query).success(function(data){
                 data.loggedIn = true;
                 console.log(data);
                 if(angular.isObject(data)){
-                    data.loggedIn = true;
                     data = angular.toJson(data);
+                    $scope.user = (Data.currentUser = data);
                     $window['localStorage'].setItem('customer', data);
-                    $rootScope.$broadcast('loggedIn', true);
-                    $location.path('/');
+                    $scope.loggedIn = true;
+                    $state.go('tabs.account.dashboard');
                 }
             });
         };
 
+        $scope.goAccount = function(){
+            if($scope.loggedIn) $state.go('tabs.account.dashboard');
+            else $state.go('signin');
+        }
+
         $scope.logout = function(){
             $scope.user = {};
+            $scope.loggedIn = false;
             Auth.logout();
         };
     }])
@@ -902,23 +923,9 @@ angular.module('ionicApp', ['ionic'])
             console.log(data);
             if(data == "null") return;
             $scope.products = data;
-            // console.log($scope.products.length);
             Data.postedProducts = data;
         });
     }
-
-    /*  $scope.status = function(prod)
-     {
-     // Do some tests
-
-     if(car.carDetails.doors > 2)
-     {
-     return true; // this will be listed in the results
-     }
-
-     return false; // otherwise it won't be within the results
-     };
-     */
 }])
 
 .controller('PostingProduceCtrl', ['$scope', 'Data', '$location', function($scope, Data, $location){
@@ -984,15 +991,15 @@ angular.module('ionicApp', ['ionic'])
     };
 }])
 
-.controller('OrdersCtrl', ['$scope','$ionicActionSheet','$ionicModal', function($scope,$ionicActionSheet, $ionicModal){
- /*   if (Data.orders != null) {
+.controller('OrdersCtrl', ['$scope','$ionicActionSheet','$ionicModal','Data', function($scope,$ionicActionSheet, $ionicModal, Data){
+    if (Data.orders != null) {
         $scope.orders = Data.orders;
     } else Data.getOrders().success(function (data) {
         console.log(data);
         $scope.orders = data;
         Data.orders = data;
     });
-    */
+
         $ionicModal.fromTemplateUrl('order-details.html', function (modal) {
             $scope.modal = modal;
         }, {
@@ -1000,7 +1007,7 @@ angular.module('ionicApp', ['ionic'])
             focusFirstInput: true
         });
 
-        $scope.show = function () {
+        $scope.show = function (order) {
             console.log('yes');
             $ionicActionSheet.show({
                 titleText: 'Order Options',
@@ -1013,16 +1020,20 @@ angular.module('ionicApp', ['ionic'])
                 destructiveText: 'Delete',
                 cancelText: 'Cancel',
                 cancel: function () {
-                    console.log('CANCELLED');
+                    return true;
                 },
                 buttonClicked: function (index) {
                     console.log('BUTTON CLICKED', index);
+                    Data.selectedOrder = order;
                     $scope.modal.show();
                     return true;
                 },
                 destructiveButtonClicked: function () {
-                    console.log('DESTRUCT');
-                    return true;
+                    Data.deleteOrder(order.Id).success(function(data, status){
+                        if(status == 200)console.log('DELETED');
+                        return true;
+                    })
+
                 }
             });
         };
@@ -1032,13 +1043,20 @@ angular.module('ionicApp', ['ionic'])
     }])
 
     .controller('OrderDetailsCtrl', ['$scope', 'Data',  function($scope, Data){
-       /* $scope.order = {};
+        $scope.order = Data.selectedOrder;
         console.log(order);
-        Data.getOrderDetails(order.Id).success(function(data){
+        Data.getOrderDetails($scope.order.Id).success(function(data){
             // console.log(data);
             data == "null" ? $scope.details = null : $scope.details = data;
         });
-        */
+
+        $scope.delete = function(){
+           Data.deleteOrder($scope.order.Id).success(function(data, status){
+               if(status == 200) {console.log('DELETED')
+               $scope.modal.hide();
+               }
+           })
+        }
     }])
 
 
@@ -1053,8 +1071,6 @@ angular.module('ionicApp', ['ionic'])
     }else{
         $scope.cust = Data.profile;
     }
-
-    if($location.path() == '/location'){
         if(Data.states == null){
             Data.getStates().success(function(data){
                 Data.states = data;
@@ -1065,7 +1081,6 @@ angular.module('ionicApp', ['ionic'])
         else{
             $scope.states = Data.states;
         }
-    }
 
     $scope.save = function(){
         var profile = angular.copy($scope.cust, {});
@@ -1077,10 +1092,11 @@ angular.module('ionicApp', ['ionic'])
         });
     };
 
-    $scope.cancel = function(){
+    /*$scope.cancel = function(){
         Data.postedProducts = null;
-        $location.path('/');
+        $state.go('tabs.');
     };
+    */
 }])
 
 .controller('CultivatedProductCtrl', ['$scope', 'Data', function($scope, Data){
