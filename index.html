@@ -10,10 +10,8 @@
     <link href="css/ionic.min.css" rel="stylesheet">
     <link href="css/index.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
-    <link href="css/font-awesome.min.css" rel="stylesheet">
     <script src="js/ionic.bundle.min.js"></script>
     <script src="js/shoppingCart.js"></script>
-    <script src="js/sha256.js"></script>
     <script src="js/app.js"></script>
     <style>
         body {
@@ -113,7 +111,7 @@
                     <div class="list col-center">
                         <label class="item item-input">
                             <span class="input-label">Email</span>
-                            <input type="text" ng-model="user.Username">
+                            <input type="text" ng-model="user.User">
                         </label>
                         <label class="item item-input">
                             <span class="input-label">Password</span>
@@ -319,71 +317,6 @@
               </ion-slide-box>
     </ion-view>
 </script>
-
-<!--
-<script id="home.html" type="text/ng-template">
-    <ion-nav-bar class="bar-balanced"> </ion-nav-bar>
-    <ion-view title="Home">
-        <ion-content padding="true">
-            <div class="row">
-
-                        <div class="col col-50 box" style="">
-                            <a href="#/tab/price/home">
-                                <div class="box-home" style="width: 70%; margin: 0 auto;background-color: red">
-                                    <img class="box-inner" style="width: 100%" src="img/price.png" >
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col col-50 box"  style="">
-                            <a href="#/tab/market/home" >
-                                <div class="box-home" style="width: 70%; margin: 0 auto;background-color: blue">
-                                    <img class="box-inner" style="width: 100%" src="img/agromarket.png" >
-                                </div>
-                            </a>
-                        </div>
-
-            </div>
-
-            <div class="row">
-
-                <div class="col col-50 box" style="">
-                    <a href="#/tab/market-perf">
-                        <div class="box-home" style="width: 80%; margin: 0 auto;">
-                            <img class="box-inner" style="width: 100%" src="img/marketPerf.jpg" >
-                        </div>
-                    </a>
-                </div>
-                <div class="col col-50 box" style="">
-                    <a href="#/tab/news-list">
-                        <div class="box-home" style="width: 70%; margin: 0 auto;">
-                            <img class="box-inner" style="width: 100%" src="img/new.png" >
-                        </div>
-                    </a>
-                </div>
-
-            </div>
-
-            <div class="row">
-                   <div class="col col-50 box"  style="">
-                    <a href="#/tab/download" >
-                        <div class="box-home" style="width: 80%; margin: 0 auto;">
-                            <img class="box-inner" style="width: 100%" src="img/download.png" >
-                        </div>
-                    </a>
-                </div>
-
-                <a href="#/tab/about" class="col col-50 box"  style="">
-                        <div class="box-home" style="width: 70%; margin: 0 auto;">
-                            <img class="box-inner" style="width: 100%" src="img/about.jpg" >
-                        </div>
-                </a>
-
-            </div>
-
-
-        </ion-content>
-    </ion-view>
-</script>-->
 
 <script id="account-menu.html" type="text/ng-template">
     <ion-side-menus>

@@ -1,6 +1,6 @@
 angular.module('ionicApp', ['ionic'])
 
-    .config(function($stateProvider, $urlRouterProvider, $sceProvider) {
+    .config(function($stateProvider, $urlRouterProvider, $sceProvider, $httpProvider) {
         $sceProvider.enabled(false);
         $stateProvider
             .state('signin', {
@@ -22,14 +22,13 @@ angular.module('ionicApp', ['ionic'])
                 url: "/tab",
                 abstract: true,
                 templateUrl: "tabs.html",
-                controller :  'LoginCtrl'
+                controller: 'LoginCtrl'
             })
             .state('tabs.home', {
                 url: "/home",
                 views: {
                     'home-tab': {
-                        templateUrl: "home.html",
-                        controller: 'HomeTabCtrl'
+                        templateUrl: "home.html"
                     }
                 }
             })
@@ -38,8 +37,7 @@ angular.module('ionicApp', ['ionic'])
                 url: "/account",
                 views: {
                     'account-tab': {
-                        templateUrl: "account-menu.html",
-                        controller: ''
+                        templateUrl: "account-menu.html"
                     }
                 }
             })
@@ -89,7 +87,7 @@ angular.module('ionicApp', ['ionic'])
                 views: {
                     'accountContent': {
                         templateUrl: "orders.html",
-                        controller: 'OrdersCtrl'
+                        controller: ''
                     }
                 }
             })
@@ -99,7 +97,7 @@ angular.module('ionicApp', ['ionic'])
                 views: {
                     'accountContent': {
                         templateUrl: "order-details.html",
-                        controller: 'OrderDetailsCtrl'
+                        controller: ''
                     }
                 }
             })
@@ -257,66 +255,55 @@ angular.module('ionicApp', ['ionic'])
                 }
             })
 
-            .state('produceposted', {
-                url: "/produce-posted",
-                views: {
-                    'account-tab': {
-                        templateUrl: "produce-posted.html"
-                    }
-                }
-            })
-
-            .state('producenew', {
-                url: "/produce-new",
-                views: {
-                    'account-tab': {
-                        templateUrl: "produce-new.html"
-                    }
-                }
-            })
-
-            .state('orders', {
-                url: "/orders",
-                views: {
-                    'account-tab': {
-                        templateUrl: "orders.html"
-                    }
-                }
-            })
-
-            .state('tabs.cart', {
-                url: "/cart",
-                views: {
-                    'account-tab': {
-                        templateUrl: "cart.html"
-                    }
-                }
-            })
-
-            .state('tabs.profile', {
-                url: "/profile",
-                views: {
-                    'account-tab': {
-                        templateUrl: "profile.html"
-                    }
-                }
-            })
-
         $urlRouterProvider.otherwise("/tab/home");
+
+      /*  var interceptor = ['$location', '$q', '$rootScope', function($location, $q, $rootScope) {
+            function success(response) {
+                return response;
+            }
+
+            function error(response) {
+
+                if(response.status === 401) {
+                    $rootScope.$broadcast('loggedOut', true);
+                    $location.path('/login');
+                    return $q.reject(response);
+                }
+                else {
+                    return $q.reject(response);
+                }
+            }
+
+            return function(promise) {
+                return promise.then(success, error);
+            }
+        }];
+
+        $httpProvider.responseInterceptors.push(interceptor);
+        */
+
+        var httpRequestInterceptor = function () {
+            return {
+                request: function (config) {
+                    config.headers['Accept'] = 'application/json';
+                    config.headers['Content-Type'] = 'application/json';
+                    return config;
+                }
+            };
+        };
+            $httpProvider.interceptors.push(httpRequestInterceptor);
 
     })
 
 .factory('Auth', function($http, $rootScope, $window, $state, Data){
     var baseUrl = 'http://www.gidifarm.com/gidifarm-api/';
-    // ...
-    var user = {};
     return {
         login: function(user) {
             return $http.post(baseUrl + 'customers/login', user);
         },
 
 
-        logout: function() {
+        logout: function(user) {
             $http.post(baseUrl + 'customers/' + user.Id + '/logout').success(function(data){
                 $window['localStorage'].removeItem('customer');
                 $state.go('tabs.home');
@@ -516,17 +503,6 @@ angular.module('ionicApp', ['ionic'])
         };
     })
 
-    .controller('HomeTabCtrl', function($scope) {
-        console.log('HomeTabCtrl');
-    })
-
-.controller('HomeTabCtrl', ['$scope', 'Data', function($scope, Data){
-
-}])
-
-    .controller('AccountTabCtrl', ['$scope', 'Data', function($scope, Data){
-
-    }])
 
     .controller('MPerfCtrl', ['$scope', 'Data','$ionicSlideBoxDelegate', function($scope, Data, $ionicSlideBoxDelegate){
         if(Data.mperf == null){
@@ -669,18 +645,6 @@ angular.module('ionicApp', ['ionic'])
     }
 
 }])
-
-    .controller('ModalCtrl', function ($scope) {
-
-        $scope.newUser = {};
-
-        $scope.createContact = function () {
-            console.log('Create Contact', $scope.newUser);
-            $scope.modal.hide();
-        };
-
-    })
-
 
 .controller('RegisterCtrl',['$scope', 'Data', '$location', function($scope, Data, $location){
     $scope.save = function(cust){
@@ -841,8 +805,8 @@ angular.module('ionicApp', ['ionic'])
 
 }])
 
-.controller('LoginCtrl',['Auth','$scope', '$window', '$state','$rootScope','Data', '$http',
-    function(Auth, $scope, $window, $state, $rootScope, Data, $http){
+.controller('LoginCtrl',['Auth','$scope', '$window', '$state','$rootScope','Data',
+    function(Auth, $scope, $window, $state, $rootScope, Data){
         if(Data.currentUser == null){
             $scope.loggedIn = false;
             $scope.user = Data.currentUser;
@@ -855,22 +819,24 @@ angular.module('ionicApp', ['ionic'])
             var query = "";
             query = Data.getQueryString(user);
             console.log(query);
-            Auth.login(query).success(function(data){
-                data.loggedIn = true;
+            Auth.login(user).success(function(data){
                 console.log(data);
+                $scope.loggedIn = true;
                 if(angular.isObject(data)){
                     data = angular.toJson(data);
                     $scope.user = (Data.currentUser = data);
                     $window['localStorage'].setItem('customer', data);
-                    $scope.loggedIn = true;
-                    $state.go('tabs.account.dashboard');
+                    $state.go('tabs.home');
                 }
-            });
+            }).error(function(data){
+                    console.log(data);
+                });
         };
 
         $scope.goAccount = function(){
-            if($scope.loggedIn) $state.go('tabs.account.dashboard');
-            else $state.go('signin');
+            //if($scope.loggedIn) $state.go('tabs.account.dashboard');
+            //else $state.go('signin');
+            $state.go('tabs.account.dashboard');
         }
 
         $scope.logout = function(){
@@ -880,125 +846,125 @@ angular.module('ionicApp', ['ionic'])
         };
     }])
 
-.controller('DashboardCtrl', ['$scope', 'Data', 'shoppingCart', function($scope, Data, shoppingCart){
-    if(Data.noOrders == null)
-    {
-        Data.getOrderNo().success(function(data){
-            Data.noOrders = data[0].count;
-            $scope.OrderNo = data[0].count;
-            // console.log(data);
-        });
-    }
-    else{
-        $scope.OrderNo = Data.noOrders;
-    }
-
-    if(Data.noCultivated == null)
-    {
-        Data.getCultivatedNo().success(function(data){
-            Data.noCultivated = data[0].count;
-            $scope.CultivatedNo = data[0].count;
-            // console.log(data);
-        })
-    }
-    else { $scope.CultivatedNo = Data.noCultivated;}
-
-    if(Data.noPosted == null)
-    {
-        Data.getPostedNo().success(function(data){
-            Data.noPosted = data[0].count;
-            $scope.PostedNo = data[0].count;
-        })
-    }
-    else { $scope.PostedNo = Data.noPosted;}
-
-    $scope.CartNo = shoppingCart.getTotalCount();
-}])
-
-.controller('PostedProduceCtrl', ['$scope', 'Data', 'shoppingCart', function($scope, Data, shoppingCart){
-    if (Data.postedProducts != null) {
-        $scope.products = Data.postedProducts;
-    } else {
-        Data.getPostedProducts().success(function (data) {
-            console.log(data);
-            if(data == "null") return;
-            $scope.products = data;
-            Data.postedProducts = data;
-        });
-    }
-}])
-
-.controller('PostingProduceCtrl', ['$scope', 'Data', '$location', function($scope, Data, $location){
-    if (Data.postingProduct != null) {
-        $scope.products = Data.postingProduct;
-    }else{
-        $scope.product = {};
-    }
-
-    if(Data.commodities == null){
-        Data.getCommodities().success(function(data){
-            $scope.commodities = data;
-            Data.commodities = data;
-            console.log(data);
-        })
-
-    }else{
-        $scope.commodities = Data.commodities;
-        //console.log(data);
-    }
-
-    $scope.save = function(){
-        Data.postedProducts = null;
-        var prod = angular.copy($scope.product, {});
-        console.log(prod);
-        Data.saveProduct(prod).success(function(data){
-            console.log(data);
-            Data.success = true;
-            $location.path('/produce-posted');
-        });
-    };
-
-    $scope.cancel = function(){
-        Data.postedProducts = null;
-        $location.path('/produce-posted')
-    };
-}])
-
-.controller('CartCtrl', ['$scope', 'Data', 'shoppingCart', function($scope, Data, shoppingCart){
-    $scope.cart = shoppingCart;
-    $scope.closeAlert = function(){
-        $scope.cart.alerts = [];
-    }
-    $scope.checkout = function(){
-        var o = {};
-        o.TotalPrice = $scope.cart.getTotalPrice();
-        o.TotalQuantity = $scope.cart.getTotalCount();
-        o.TransactionStatus = 'initiated';
-        o.Details = [];
-        angular.forEach($scope.cart.items, function(item)
+    .controller('DashboardCtrl', ['$scope', 'Data', 'shoppingCart',  function($scope, Data, shoppingCart){
+        if(Data.noOrders == null)
         {
-            o.Details.push({SellProduct : item.name, Price : item.price, Quantity : item.quantity});
-        });
-        console.log(o.Details);
-        // o.Details = $scope.items;
-        Data.placeOrder(o).success(function(data, status){
-            console.log(status);
-            if(status == 200){
-                $scope.cart.clearItems();
-                $scope.cart.alerts[0] = {type : 'success', msg : 'Order Made Successfully'};
-            }
-        })
-    };
-}])
+            Data.getOrderNo().success(function(data){
+                Data.noOrders = data[0].count;
+                $scope.OrderNo = data[0].count;
+                // console.log(data);
+            });
+        }
+        else{
+            $scope.OrderNo = Data.noOrders;
+        }
 
-.controller('OrdersCtrl', ['$scope','$ionicActionSheet','$ionicModal','Data', function($scope,$ionicActionSheet, $ionicModal, Data){
-    if (Data.orders != null) {
-        $scope.orders = Data.orders;
-    } else Data.getOrders().success(function (data) {
-        console.log(data);
-        $scope.orders = data;
-        Data.orders = data;
-    });
+        if(Data.noCultivated == null)
+        {
+            Data.getCultivatedNo().success(function(data){
+                Data.noCultivated = data[0].count;
+                $scope.CultivatedNo = data[0].count;
+                // console.log(data);
+            })
+        }
+        else { $scope.CultivatedNo = Data.noCultivated;}
+
+        if(Data.noPosted == null)
+        {
+            Data.getPostedNo().success(function(data){
+                Data.noPosted = data[0].count;
+                $scope.PostedNo = data[0].count;
+            })
+        }
+        else { $scope.PostedNo = Data.noPosted;}
+
+        $scope.CartNo = shoppingCart.getTotalCount();
+    }])
+
+    .controller('PostedProduceCtrl', ['$scope', 'Data', 'shoppingCart', function($scope, Data, shoppingCart){
+        if (Data.postedProducts != null) {
+            $scope.products = Data.postedProducts;
+        } else {
+            Data.getPostedProducts().success(function (data) {
+                console.log(data);
+                if(data == "null") return;
+                $scope.products = data;
+                Data.postedProducts = data;
+            });
+        }
+    }])
+
+    .controller('PostingProduceCtrl', ['$scope', 'Data', '$location', function($scope, Data, $location){
+        if (Data.postingProduct != null) {
+            $scope.products = Data.postingProduct;
+        }else{
+            $scope.product = {};
+        }
+
+        if(Data.commodities == null){
+            Data.getCommodities().success(function(data){
+                $scope.commodities = data;
+                Data.commodities = data;
+                console.log(data);
+            })
+
+        }else{
+            $scope.commodities = Data.commodities;
+            //console.log(data);
+        }
+
+        $scope.save = function(){
+            Data.postedProducts = null;
+            var prod = angular.copy($scope.product, {});
+            console.log(prod);
+            Data.saveProduct(prod).success(function(data){
+                console.log(data);
+                Data.success = true;
+                $location.path('/produce-posted');
+            });
+        };
+
+        $scope.cancel = function(){
+            Data.postedProducts = null;
+            $location.path('/produce-posted')
+        };
+    }])
+
+    .controller('CartCtrl', ['$scope', 'Data', 'shoppingCart', function($scope, Data, shoppingCart){
+        $scope.cart = shoppingCart;
+        $scope.closeAlert = function(){
+            $scope.cart.alerts = [];
+        }
+        $scope.checkout = function(){
+            var o = {};
+            o.TotalPrice = $scope.cart.getTotalPrice();
+            o.TotalQuantity = $scope.cart.getTotalCount();
+            o.TransactionStatus = 'initiated';
+            o.Details = [];
+            angular.forEach($scope.cart.items, function(item)
+            {
+                o.Details.push({SellProduct : item.name, Price : item.price, Quantity : item.quantity});
+            });
+            console.log(o.Details);
+            // o.Details = $scope.items;
+            Data.placeOrder(o).success(function(data, status){
+                console.log(status);
+                if(status == 200){
+                    $scope.cart.clearItems();
+                    $scope.cart.alerts[0] = {type : 'success', msg : 'Order Made Successfully'};
+                }
+            })
+        };
+    }])
+
+    .controller('OrdersCtrl', ['$scope','$ionicActionSheet','$ionicModal','Data', function($scope,$ionicActionSheet, $ionicModal, Data){
+        if (Data.orders != null) {
+            $scope.orders = Data.orders;
+        } else Data.getOrders().success(function (data) {
+            console.log(data);
+            $scope.orders = data;
+            Data.orders = data;
+        });
 
         $ionicModal.fromTemplateUrl('order-details.html', function (modal) {
             $scope.modal = modal;
@@ -1014,7 +980,7 @@ angular.module('ionicApp', ['ionic'])
                 buttons: [
                     {
                         text: 'Show Details'
-                    },
+                    }
 
                 ],
                 destructiveText: 'Delete',
@@ -1051,26 +1017,26 @@ angular.module('ionicApp', ['ionic'])
         });
 
         $scope.delete = function(){
-           Data.deleteOrder($scope.order.Id).success(function(data, status){
-               if(status == 200) {console.log('DELETED')
-               $scope.modal.hide();
-               }
-           })
+            Data.deleteOrder($scope.order.Id).success(function(data, status){
+                if(status == 200) {console.log('DELETED')
+                    $scope.modal.hide();
+                }
+            })
         }
     }])
 
 
     .controller('ProfileCtrl', ['$scope', 'Data', '$location', function($scope, Data, $location){
-    if(Data.profile == null){
-        Data.getProfile().success(function(data){
-            $scope.cust = data[0];
-            Data.profile = data[0];
-            console.log(data);
-        });
+        if(Data.profile == null){
+            Data.getProfile().success(function(data){
+                $scope.cust = data[0];
+                Data.profile = data[0];
+                console.log(data);
+            });
 
-    }else{
-        $scope.cust = Data.profile;
-    }
+        }else{
+            $scope.cust = Data.profile;
+        }
         if(Data.states == null){
             Data.getStates().success(function(data){
                 Data.states = data;
@@ -1082,192 +1048,194 @@ angular.module('ionicApp', ['ionic'])
             $scope.states = Data.states;
         }
 
-    $scope.save = function(){
-        var profile = angular.copy($scope.cust, {});
-        console.log(profile);
-        Data.updateProfile(profile).success(function(data){
-            console.log(data);
-            // Data.profile = profile;
-            //$location.path('/produce-posted');
-        });
-    };
+        $scope.save = function(){
+            var profile = angular.copy($scope.cust, {});
+            console.log(profile);
+            Data.updateProfile(profile).success(function(data){
+                console.log(data);
+                // Data.profile = profile;
+                //$location.path('/produce-posted');
+            });
+        };
 
-    /*$scope.cancel = function(){
-        Data.postedProducts = null;
-        $state.go('tabs.');
-    };
-    */
-}])
+        /*$scope.cancel = function(){
+         Data.postedProducts = null;
+         $state.go('tabs.');
+         };
+         */
+    }])
 
-.controller('CultivatedProductCtrl', ['$scope', 'Data', function($scope, Data){
-    //  $scope.order = order;
-    // console.log(order);
-    //  Data.getOrderDetails(order.Id).success(function(data){
-    // console.log(data);
-    //     data == "null" ? $scope.details = null : $scope.details = data;
-    // })
-    if(Data.commodities == null){
-        Data.getCommodities().success(function(data){
-            $scope.products = data;
-            Data.commodities = data;
-            console.log(data);
-        });
+    .controller('CultivatedProductCtrl', ['$scope', 'Data', function($scope, Data){
+        //  $scope.order = order;
+        // console.log(order);
+        //  Data.getOrderDetails(order.Id).success(function(data){
+        // console.log(data);
+        //     data == "null" ? $scope.details = null : $scope.details = data;
+        // })
+        if(Data.commodities == null){
+            Data.getCommodities().success(function(data){
+                $scope.products = data;
+                Data.commodities = data;
+                console.log(data);
+            });
 
-    }else{
-        $scope.products = Data.commodities;
-    }
-    if(Data.cultivatedProducts == null){
-        Data.getCultivatedProducts().success(function(data){
-            console.log(data);
-            if(data == "null") return;
-            $scope.cultivatedProducts = data;
-            Data.cultivatedProducts = data;
-        });
-
-    }else{
-        $scope.cultivatedProducts = Data.cultivatedProducts;
-    }
-
-    $scope.addCrop = function(prod){
-        var crop = angular.copy(prod, {});
-        var found = false;
-        angular.forEach($scope.cultivatedProducts, function(p){
-            if(p.Comm == crop.Name) {
-                found = true;
-                return;
-            }
-        });
-        if(found) return;
-        crop.Comm = crop.Name;
-        delete crop.Id;
-        Data.addCultivatedProds(crop).success(function(data){
-            console.log(data);
-            if(data != "null"){
-                crop.Id = data;
-                $scope.cultivatedProducts.push(crop);
-            }
-        });
-    }
-
-    $scope.removeCrop = function(crop, index){
-        Data.removeCultivatedProds(crop.Id).success(function(data){
-            console.log(data);
-            if(data == "true"){
-                $scope.cultivatedProducts.splice(index, 1);
-            }
-        })
-    }
-
-
-}])
-
-.controller('NewProduceCtrl', [ '$scope', '$http', '$timeout', '$upload', '$location','Data',  function($scope, $http, $timeout, $upload, $location, Data) {
-    if (Data.postingProduct != null) {
-        $scope.products = Data.postingProduct;
-    }else{
-        $scope.product = {};
-    }
-
-    if(Data.commodities == null){
-        Data.getCommodities().success(function(data){
-            $scope.commodities = data;
-            Data.commodities = data;
-            console.log(data);
-        })
-
-    }else{
-        $scope.commodities = Data.commodities;
-        //console.log(data);
-    }
-
-    /* $scope.save = function(){
-     Data.postedProducts = null;
-     var prod = angular.copy($scope.product, {});
-     console.log(prod);
-     Data.saveProduct(prod).success(function(data){
-     console.log(data);
-     Data.success = true;
-     $location.path('/produce-posted');
-     });
-     };
-     */
-
-    $scope.cancel = function(){
-        Data.postedProducts = null;
-        $location.path('/produce-posted')
-    };
-
-
-    $scope.fileReaderSupported = window.FileReader != null;
-    $scope.uploadRightAway = false;
-
-    $scope.hasUploader = function(index) {
-        return $scope.upload[index] != null;
-    };
-    $scope.cancel = function(l){
-        $location.path('/' + l);
-    }
-    $scope.abort = function(index) {
-        $scope.upload[index].abort();
-        $scope.upload[index] = null;
-    };
-    $scope.onFileSelect = function($files) {
-        $scope.selectedFiles = [];
-        $scope.progress = [];
-        if ($scope.upload && $scope.upload.length > 0) {
-            for (var i = 0; i < $scope.upload.length; i++) {
-                if ($scope.upload[i] != null) {
-                    $scope.upload[i].abort();
-                }
-            }
+        }else{
+            $scope.products = Data.commodities;
         }
-        $scope.upload = [];
-        $scope.uploadResult = [];
-        $scope.selectedFiles = $files;
-        $scope.dataUrls = [];
-        for ( var i = 0; i < $files.length; i++) {
-            var $file = $files[i];
-            if (window.FileReader && $file.type.indexOf('image') > -1) {
-                var fileReader = new FileReader();
-                fileReader.readAsDataURL($files[i]);
-                function setPreview(fileReader, index) {
-                    fileReader.onload = function(e) {
-                        $timeout(function() {
-                            $scope.dataUrls[index] = e.target.result;
-                        });
+        if(Data.cultivatedProducts == null){
+            Data.getCultivatedProducts().success(function(data){
+                console.log(data);
+                if(data == "null") return;
+                $scope.cultivatedProducts = data;
+                Data.cultivatedProducts = data;
+            });
+
+        }else{
+            $scope.cultivatedProducts = Data.cultivatedProducts;
+        }
+
+        $scope.addCrop = function(prod){
+            var crop = angular.copy(prod, {});
+            var found = false;
+            angular.forEach($scope.cultivatedProducts, function(p){
+                if(p.Comm == crop.Name) {
+                    found = true;
+                    return;
+                }
+            });
+            if(found) return;
+            crop.Comm = crop.Name;
+            delete crop.Id;
+            Data.addCultivatedProds(crop).success(function(data){
+                console.log(data);
+                if(data != "null"){
+                    crop.Id = data;
+                    $scope.cultivatedProducts.push(crop);
+                }
+            });
+        }
+
+        $scope.removeCrop = function(crop, index){
+            Data.removeCultivatedProds(crop.Id).success(function(data){
+                console.log(data);
+                if(data == "true"){
+                    $scope.cultivatedProducts.splice(index, 1);
+                }
+            })
+        }
+
+
+    }])
+
+    .controller('NewProduceCtrl', [ '$scope', '$http', '$timeout', '$upload', '$location','Data',  function($scope, $http, $timeout, $upload, $location, Data) {
+        if (Data.postingProduct != null) {
+            $scope.products = Data.postingProduct;
+        }else{
+            $scope.product = {};
+        }
+
+        if(Data.commodities == null){
+            Data.getCommodities().success(function(data){
+                $scope.commodities = data;
+                Data.commodities = data;
+                console.log(data);
+            })
+
+        }else{
+            $scope.commodities = Data.commodities;
+            //console.log(data);
+        }
+
+        /* $scope.save = function(){
+         Data.postedProducts = null;
+         var prod = angular.copy($scope.product, {});
+         console.log(prod);
+         Data.saveProduct(prod).success(function(data){
+         console.log(data);
+         Data.success = true;
+         $location.path('/produce-posted');
+         });
+         };
+         */
+
+        $scope.cancel = function(){
+            Data.postedProducts = null;
+            $location.path('/produce-posted')
+        };
+
+
+        $scope.fileReaderSupported = window.FileReader != null;
+        $scope.uploadRightAway = false;
+
+        $scope.hasUploader = function(index) {
+            return $scope.upload[index] != null;
+        };
+        $scope.cancel = function(l){
+            $location.path('/' + l);
+        }
+        $scope.abort = function(index) {
+            $scope.upload[index].abort();
+            $scope.upload[index] = null;
+        };
+        $scope.onFileSelect = function($files) {
+            $scope.selectedFiles = [];
+            $scope.progress = [];
+            if ($scope.upload && $scope.upload.length > 0) {
+                for (var i = 0; i < $scope.upload.length; i++) {
+                    if ($scope.upload[i] != null) {
+                        $scope.upload[i].abort();
                     }
                 }
-                setPreview(fileReader, i);
             }
-            $scope.progress[i] = -1;
-            if ($scope.uploadRightAway) {
-                $scope.start(i);
+            $scope.upload = [];
+            $scope.uploadResult = [];
+            $scope.selectedFiles = $files;
+            $scope.dataUrls = [];
+            for ( var i = 0; i < $files.length; i++) {
+                var $file = $files[i];
+                if (window.FileReader && $file.type.indexOf('image') > -1) {
+                    var fileReader = new FileReader();
+                    fileReader.readAsDataURL($files[i]);
+                    function setPreview(fileReader, index) {
+                        fileReader.onload = function(e) {
+                            $timeout(function() {
+                                $scope.dataUrls[index] = e.target.result;
+                            });
+                        }
+                    }
+                    setPreview(fileReader, i);
+                }
+                $scope.progress[i] = -1;
+                if ($scope.uploadRightAway) {
+                    $scope.start(i);
+                }
             }
         }
-    }
 
-    $scope.save = function() {
-        $scope.progress[0] = 0;
-        var prod = angular.copy($scope.product, {});
-        prod.CustId = Data.currentUser.Id;
-        console.log(prod);
-        $scope.upload[0] = $upload.upload({
-            url : 'http://localhost/gidifarm-api/gidifarm-api/sproducts',
-            method: 'POST',
-            headers: {'myHeaderKey': 'myHeaderVal'},
-            data : prod,
-            file: $scope.selectedFiles[0],
-            fileFormDataName: 'myFile'
-        }).then(function(response) {
-                $scope.uploadResult.push(response.data);
-                console.log(response);
-                console.log(response.data);
-                Data.success = true;
-                $location.path('/produce-posted');
-            }, null, function(evt) {
-                $scope.progress[0] = parseInt(100.0 * evt.loaded / evt.total);
-            });
-    }
-} ]);
+        $scope.save = function() {
+            $scope.progress[0] = 0;
+            var prod = angular.copy($scope.product, {});
+            prod.CustId = Data.currentUser.Id;
+            console.log(prod);
+            $scope.upload[0] = $upload.upload({
+                url : 'http://www.gidifarm.com/gidifarm-api/gidifarm-api/sproducts',
+                method: 'POST',
+                headers: {'myHeaderKey': 'myHeaderVal'},
+                data : prod,
+                file: $scope.selectedFiles[0],
+                fileFormDataName: 'myFile'
+            }).then(function(response) {
+                    $scope.uploadResult.push(response.data);
+                    console.log(response);
+                    console.log(response.data);
+                    Data.success = true;
+                    $location.path('/produce-posted');
+                }, null, function(evt) {
+                    $scope.progress[0] = parseInt(100.0 * evt.loaded / evt.total);
+                });
+        }
+    } ]);
+
+
 
 
