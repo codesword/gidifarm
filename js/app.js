@@ -330,7 +330,7 @@ angular.module('ionicApp', ['ionic'])
             console.log('Logged Out');
             $scope.loggedIn = false;
             Auth.logout(Data.currentUser);
-            toast.showShortBottom('Logout successfull');
+            window.plugins.toast.showLongTop('Logout successfull');
             //$scope.showlogOut();
             Data.currentUser = null
         }
