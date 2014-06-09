@@ -1,4 +1,4 @@
-angular.module('ionicApp', ['ionic','angularFileUpload'])
+angular.module('ionicApp', ['ionic'])
 
     .config(function($stateProvider, $urlRouterProvider, $sceProvider, $httpProvider) {
         $sceProvider.enabled(false);
@@ -71,7 +71,7 @@ angular.module('ionicApp', ['ionic','angularFileUpload'])
                 views: {
                     'accountContent': {
                         templateUrl: "new-produce.html",
-                        controller: 'CameraCtrl'
+                        controller: ''
                     }
                 }
             })
