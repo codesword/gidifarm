@@ -71,7 +71,7 @@ angular.module('ionicApp', ['ionic'])
                 views: {
                     'accountContent': {
                         templateUrl: "new-produce.html",
-                        controller: ''
+                        controller: 'CamCtrl'
                     }
                 }
             })
@@ -1442,8 +1442,8 @@ angular.module('ionicApp', ['ionic'])
     }
 })
 
-    .controller('CamCtrl', ['$scope', '$location', 'GetUU',
-        function($scope, $location, GetUU) {
+    .controller('CamCtrl', ['$scope', '$location',
+        function($scope, $location) {
 
             // init variables
             $scope.data = {};
@@ -1465,12 +1465,10 @@ angular.module('ionicApp', ['ionic'])
                 destinationType=navigator.camera.DestinationType.FILE_URI;
             });
 
-            // get upload URL for FORM
-
 
             // take picture
             $scope.takePicture = function() {
-                //console.log("got camera button click");
+                console.log("got camera button click");
                 var options =   {
                     quality: 50,
                     destinationType: destinationType,
