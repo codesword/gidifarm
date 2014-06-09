@@ -70,7 +70,8 @@ angular.module('ionicApp', ['ionic','angularFileUpload'])
                 url: "/new-produce",
                 views: {
                     'accountContent': {
-                        templateUrl: 'CamCtrl'
+                        templateUrl: "new-produce.html",
+                        controller: 'CameraCtrl'
                     }
                 }
             })
@@ -400,7 +401,6 @@ angular.module('ionicApp', ['ionic','angularFileUpload'])
             }
         };
     })
-
 
     .factory('Data', ['$http', function($http){
         var state = null;
@@ -901,10 +901,6 @@ angular.module('ionicApp', ['ionic','angularFileUpload'])
         };
 
     }])
-
-
-
-
 
     .controller('LoginCtrl',['Auth','$scope', '$window', '$state','$rootScope','Data','Loader','$http',
         function(Auth, $scope, $window, $state, $rootScope, Data, Loader, $http){
@@ -1525,7 +1521,4 @@ angular.module('ionicApp', ['ionic','angularFileUpload'])
                 }
             };
         }]);
-
-
-
 
