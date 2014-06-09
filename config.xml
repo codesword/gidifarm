@@ -56,7 +56,7 @@
     <!-- Third party plugins -->
     <!-- A list of available plugins are available at https://build.phonegap.com/plugins -->
 
-    <gap:plugin name="nl.x-services.plugins.toast" version="2.0" />
+    <gap:plugin name="nl.x-services.plugins.toast" />
     <gap:plugin name="nl.x-services.plugins.socialsharing" version="4.0.8" />
 
 

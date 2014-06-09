@@ -941,6 +941,7 @@ angular.module('ionicApp', ['ionic'])
                 $scope.user = {};
                 $scope.loggedIn = false;
                 Auth.logout();
+                toast.showShortBottom('Logout successfull');
                 $rootScope.$broadcast('logged-in', false);
             };
         }])
