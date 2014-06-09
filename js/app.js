@@ -1046,7 +1046,7 @@ angular.module('ionicApp', ['ionic'])
         };
     }])
 
-    .controller('OrdersCtrl', ['$scope','$ionicActionSheet','$ionicModal','Loader','Data', function($scope,$ionicActionSheet, $ionicModal, Loader, Data){
+    .controller('OrdersCtrl', ['$scope','$ionicActionSheet','$ionicModal','Loader','Data','Notification', function($scope,$ionicActionSheet, $ionicModal, Loader, Data, Notification){
          if (Data.orders != null) {
          $scope.orders = Data.orders;
          } else {
@@ -1056,6 +1056,7 @@ angular.module('ionicApp', ['ionic'])
                  console.log(data);
                  $scope.orders = data;
                  Data.orders = data;
+                 Notification.alert('successfully loaded orders', function(){return true},'Orders Loaded', 'OK');
              });
          }
 
@@ -1460,7 +1461,7 @@ angular.module('ionicApp', ['ionic'])
                     // error handling
                     return;
                 }
-                //pictureSource=navigator.camera.PictureSourceType.PHOTOLIBRARY;
+                getPictureSource=navigator.camera.PictureSourceType.PHOTOLIBRARY;
                 pictureSource=navigator.camera.PictureSourceType.CAMERA;
                 destinationType=navigator.camera.DestinationType.FILE_URI;
             });
@@ -1491,21 +1492,46 @@ angular.module('ionicApp', ['ionic'])
                     },
                     options);
             };
+            $scope.getPicture = function() {
+                console.log("got file button click");
+                var options =   {
+                    quality: 50,
+                    destinationType: destinationType,
+                    sourceType: getPictureSource,
+                    encodingType: 0
+                };
+                if (!navigator.camera)
+                {
+                    // error handling
+                    return;
+                }
+                navigator.camera.getPicture(
+                    function (imageURI) {
+                        //console.log("got camera success ", imageURI);
+                        $scope.mypicture = imageURI;
+                    },
+                    function (err) {
+                        //console.log("got camera error ", err);
+                        // error handling camera plugin
+                    },
+                    options);
+            };
 
             // do POST on upload url form by http / html form
-            $scope.update = function(obj) {
+            $scope.save = function(obj) {
                 if (!$scope.mypicture)
                 {
                     // error handling no picture given
                     return;
                 }
                 var options = new FileUploadOptions();
+                var prod = angular.copy($scope.product, {});
+                prod.CustId = Data.currentUser.Id;
+                console.log(prod);
                 options.fileKey="myFile";
                 options.fileName=$scope.mypicture.substr($scope.mypicture.lastIndexOf('/')+1);
                 options.mimeType="image/jpeg";
-                var params = {};
-                params.other = obj.text; // some other POST fields
-                options.params = params;
+                options.params = prod;
 
                 //console.log("new imp: prepare upload now");
                 var ft = new FileTransfer();
