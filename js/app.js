@@ -259,7 +259,7 @@ angular.module('ionicApp', ['ionic'])
         };
     })
 
-    .controller('HomeCtrl', function($scope, $rootScope, Data, Auth, $ionicPopup, $timeout, $state) {
+    .controller('HomeCtrl', function($scope, $rootScope, Data, Auth, $ionicPopup, $timeout, $state, Toast) {
      if(Data.currentUser == null){
          $scope.loggedIn = false;
      }else $scope.loggedIn = true;
@@ -314,7 +314,7 @@ angular.module('ionicApp', ['ionic'])
         $scope.goAccount = function(){
             if($scope.loggedIn)
             $state.go('account.dashboard');
-            else $scope.showPopup();
+            else  Toast.showLongTop('You Need To Login To Continue.');
         }
 
         $scope.showlogOut = function() {
@@ -330,7 +330,7 @@ angular.module('ionicApp', ['ionic'])
             console.log('Logged Out');
             $scope.loggedIn = false;
             Auth.logout(Data.currentUser);
-            window.plugins.toast.showLongTop('Logout successfull');
+            Toast.showLongTop('You Have Successfully Logged Out.');
             //$scope.showlogOut();
             Data.currentUser = null
         }
@@ -354,6 +354,17 @@ angular.module('ionicApp', ['ionic'])
                 $rootScope.loading.hide();
             }
         }
+    })
+
+    .factory('Toast', function() {
+        // Trigger the loading indicator
+        window.plugins = {};
+        return window.plugins.toast;
+    })
+
+    .factory('SocialShare', function() {
+        // Trigger the loading indicator
+        return window.plugins.socialsharing;
     })
 
     .factory('Notification', function ($q, $window, PhoneGap) {
@@ -579,7 +590,7 @@ angular.module('ionicApp', ['ionic'])
 
     }])
 
-    .controller('PriceCtrl', ['$scope', 'Data','Loader', function($scope, Data, Loader){
+    .controller('PriceCtrl', ['$scope', 'Data','Loader','Toast', function($scope, Data, Loader, Toast){
         $scope.noProduceDisplay = false;
         $scope.values = {};
         //$scope.commId = 0;
@@ -589,6 +600,7 @@ angular.module('ionicApp', ['ionic'])
                 Data.states = data;
                 $scope.states  = data;
                 Loader.hide();
+                Toast.showLongTop('States Data Received Successfully.');
             })
         }
         else {
@@ -610,6 +622,7 @@ angular.module('ionicApp', ['ionic'])
                     Data.selectedState = $scope.state;
                     newState = true;
                     Loader.hide();
+                    Toast.showLongTop('Commodities Received Successfully.');
                 });
             }
             else{
@@ -635,6 +648,7 @@ angular.module('ionicApp', ['ionic'])
                     // console.log(data);
                     $scope.products = data;
                     Data.selectedCommodity = comm;
+                    Toast.showLongTop('Products Received Successfully.');
                 });
             }
             else {
@@ -647,8 +661,12 @@ angular.module('ionicApp', ['ionic'])
             Loader.show();
             Data.getCommoditiesByState($scope.values.stateId).success(function(data){
                 Loader.hide();
+                if(data == ""){
+                    Toast.showLongTop('No Commodity in the Selected State.');
+                }
                 Data.commodities = data;
                 $scope.commodities = data;
+                Toast.showLongTop('commodities Data Received Successfully.');
             });
         });
 
@@ -663,24 +681,24 @@ angular.module('ionicApp', ['ionic'])
                 Loader.hide();
                 if(data == "null" || !angular.isArray(data)) {
                     $scope.products = null;
-                    $scope.alerts = [];
-                    $scope.alerts[0] = {type : 'danger', msg : 'No Price Available For the Selected Commodity In The Selected State.'};
-
+                    Toast.showLongTop('No Product Available.');
                     return;
                 }
                 Data.products = data;
                 // console.log(data);
                 $scope.products = data;
+                Toast.showLongTop('Product Received Successfully.');
             });
         })
 
     }])
 
-    .controller('NewsCtrl',['$scope', 'Data', '$state', 'Loader', function($scope, Data, $state,Loader){
+    .controller('NewsCtrl',['$scope', 'Data', '$state', 'Loader','Toast', function($scope, Data, $state,Loader, Toast){
         if(Data.news == null){
             Loader.show();
             Data.getNews().success(function(data){
                 Loader.hide();
+                Toast.showLongTop('News Received Successfully.');
                 $scope.allNews = data;
                 Data.news = data;
             });
@@ -730,7 +748,7 @@ angular.module('ionicApp', ['ionic'])
 
     }])
 
-    .controller('RegisterCtrl',['$scope', 'Data', '$location','Loader', function($scope, Data, $location, Loader){
+    .controller('RegisterCtrl',['$scope', 'Data', '$state','Loader','Toast', function($scope, Data, $state, Loader, Toast){
         $scope.save = function(cust){
             Loader.show();
             console.log(cust);
@@ -740,25 +758,20 @@ angular.module('ionicApp', ['ionic'])
             var customer = angular.copy(cust, {});
             customer.Password = sha256_digest(customer.Password);
             console.log(customer);
-            Data.register(customer).success(function(data){
+            Data.register(customer).success(function(data, status){
                 Loader.hide();
+                if(status == 200){Toast.showLongTop('User Account Created Successfully.');return;}
+                Toast.showLongTop('There Was An Error Creating Account.');
                 console.log(data);
             });
         }
     }])
 
-    .controller('NewsDetailCtrl',['$scope', 'Data',  '$sce', 'Loader','$timeout', function($scope, Data, $sce, Loader, $timeout){
+    .controller('NewsDetailCtrl',['$scope', 'Data',  '$sce', 'Loader','Toast', function($scope, Data, $sce, Loader, Toast){
         $scope.news = Data.selectedNews;
         $scope.template = null;
-        Loader.show();
-       var checkTemplate = function() {
-            if($scope.template != null)
-                Loader.hide();
-            else
-                $timeout(checkTemplate(), 500);
-        }
+        Toast.showLongTop('Loading News');
         $scope.template = $sce.trustAsHtml('http://gidifarm-admin.azurewebsites.net//gidifarm-api/newsTemplate/' + Data.selectedNews.Id + '.html');
-        $timeout(checkTemplate());
     }])
 
     .controller('ContactCtrl',['$scope', 'Data' , function($scope, Data){
@@ -787,10 +800,8 @@ angular.module('ionicApp', ['ionic'])
         }
     }])
 
-    .controller('MarketMenuCtrl', ['$scope', 'Data', '$rootScope', '$location', function($scope, Data, $rootScope, $location){
-        $scope.closeAlert = function() {
-            $scope.alerts = ($scope.cart.alerts = []);
-        };
+    .controller('MarketMenuCtrl', ['$scope', 'Data', '$rootScope', 'Toast', function($scope, Data, $rootScope, Toast){
+
         $scope.menu = {};
         Data.selectedMState = {};
         Data.selectedMCommodity = {};
@@ -800,7 +811,7 @@ angular.module('ionicApp', ['ionic'])
                 Data.getStates().success(function(data){
                     Data.states = data;
                     $scope.states  = data;
-                    // console.log(data);
+                    Toast.showLongTop('States Data Loaded Successfully.');
                 });
             }
             else {
@@ -813,7 +824,7 @@ angular.module('ionicApp', ['ionic'])
                 Data.getCategories().success(function(data){
                     Data.categories = data;
                     $scope.categories = data;
-                    // console.log(data);
+                    Toast.showLongTop('Product Category Loaded Successfully.');
                 });
             }
             else{
@@ -826,6 +837,7 @@ angular.module('ionicApp', ['ionic'])
                 Data.marketCommodities = data;
                 $scope.commodities = data;
                 //console.log(data);
+                Toast.showLongTop('Commodities Loaded Successfully.');
             });
 
         };
@@ -859,7 +871,7 @@ angular.module('ionicApp', ['ionic'])
 
     }])
 
-    .controller('MarketCtrl', ['$scope', 'Data', '$rootScope', '$state','Loader', function($scope, Data, $rootScope, $state, Loader){
+    .controller('MarketCtrl', ['$scope', 'Data', '$rootScope', '$state','Loader','Toast', function($scope, Data, $rootScope, $state, Loader, Toast){
 
         (function(){
             if(Data.marketProducts == null){
@@ -867,8 +879,13 @@ angular.module('ionicApp', ['ionic'])
                 Data.getAllMProduct().success(function (data) {
                     var products;
                     Loader.hide();
-                    data == "null" ? $scope.products = null : $scope.products = data;
-                    $scope.alerts = [];
+                    if(data == "null"){
+                        $scope.products = null;
+                        Toast.showLongTop('No Product Available');
+                        return;
+                    }
+                    $scope.products = data;
+                    Toast.showLongTop('Market Products Loaded  Successfully.');
                 })
             }else{
                 $scope.products = Data.marketProducts;
@@ -885,8 +902,15 @@ angular.module('ionicApp', ['ionic'])
             var cat = angular.isUndefined(params.category) ? 'all' : params.category;
             var comm = angular.isUndefined(params.commodity) ? '' : params.commodity;
             Data.getMProducts(state, cat.trim(), comm).success(function(data){
-                data == "" ? $scope.products = null : $scope.products = data;
+
                 Loader.hide();
+               if(data == ""){
+                   $scope.products = null;
+                   Toast.showLongTop('No Products Available');
+                   return;
+               }
+                $scope.products = data;
+                Toast.showLongTop('Market Products Loaded  Successfully.');
                 console.log(data);
             });
 
@@ -903,8 +927,8 @@ angular.module('ionicApp', ['ionic'])
 
     }])
 
-    .controller('LoginCtrl',['Auth','$scope', '$window', '$state','$rootScope','Data','Loader','$http',
-        function(Auth, $scope, $window, $state, $rootScope, Data, Loader, $http){
+    .controller('LoginCtrl',['Auth','$scope', '$window', '$state','$rootScope','Data','Loader','$http','Toast',
+        function(Auth, $scope, $window, $state, $rootScope, Data, Loader, $http, Toast){
             if(Data.currentUser == null){
                 $scope.loggedIn = false;
                 $scope.user = Data.currentUser;
@@ -926,6 +950,7 @@ angular.module('ionicApp', ['ionic'])
                         $window['localStorage'].setItem('customer', data);
                         $rootScope.$broadcast('logged-in', true);
                         $state.go('home');
+                        Toast.showLongTop('Login Was  Successfully.');
                     }
                 }).error(function(data){
                         console.log(data);
@@ -942,7 +967,7 @@ angular.module('ionicApp', ['ionic'])
                 $scope.user = {};
                 $scope.loggedIn = false;
                 Auth.logout();
-                toast.showShortBottom('Logout successfull');
+                Toast.showCenter('Logout successfull');
                 $rootScope.$broadcast('logged-in', false);
             };
         }])
@@ -985,7 +1010,7 @@ angular.module('ionicApp', ['ionic'])
         $scope.CartNo = shoppingCart.getTotalCount();
     }])
 
-    .controller('PostedProduceCtrl', ['$scope', 'Data', 'shoppingCart','Loader','$state', function($scope, Data, shoppingCart, Loader, $state){
+    .controller('PostedProduceCtrl', ['$scope', 'Data', 'shoppingCart','Loader','$state','Toast', function($scope, Data, shoppingCart, Loader, $state, Toast){
         if (Data.postedProducts != null) {
             $scope.products = Data.postedProducts;
         } else {
@@ -993,7 +1018,11 @@ angular.module('ionicApp', ['ionic'])
             Data.getPostedProducts().success(function (data) {
                 console.log(data);
                 Loader.hide();
-                if(data == "null") return;
+                if(data == "null") {
+                    Toast.showLongTop('No Product To Display');
+                    return;
+                }
+                Toast.showLongTop('Posted Products Loaded  Successfully.');
                 $scope.products = data;
                 Data.postedProducts = data;
             });
@@ -1003,7 +1032,7 @@ angular.module('ionicApp', ['ionic'])
             Loader.show();
             Data.deleteProduct(id).success(function(data){
                 buffer = [ ];
-                angular.forEach( $scope.products,  function(prod, key) {
+                angular.forEach( $scope.products,  function(prod) {
                     if ( prod.Id != id )
                     {
                         buffer.push( prod );
@@ -1012,6 +1041,8 @@ angular.module('ionicApp', ['ionic'])
 
                 $scope.products = (Data.postedProducts = buffer);
                 Loader.hide();
+                Toast.showLongTop('Product Deleted  Successfully.');
+
             })
         };
 
@@ -1021,7 +1052,7 @@ angular.module('ionicApp', ['ionic'])
         }
     }])
 
-    .controller('CartCtrl', ['$scope', 'Data', 'shoppingCart', function($scope, Data, shoppingCart){
+    .controller('CartCtrl', ['$scope', 'Data', 'shoppingCart','Toast', function($scope, Data, shoppingCart, Toast){
         $scope.cart = shoppingCart;
         $scope.closeAlert = function(){
             $scope.cart.alerts = [];
@@ -1042,13 +1073,13 @@ angular.module('ionicApp', ['ionic'])
                 console.log(status);
                 if(status == 200){
                     $scope.cart.clearItems();
-                    $scope.cart.alerts[0] = {type : 'success', msg : 'Order Made Successfully'};
+                    Toast.showLongTop('Order Was Made Successfully.');
                 }
             })
         };
     }])
 
-    .controller('OrdersCtrl', ['$scope','$ionicActionSheet','$ionicModal','Loader','Data','Notification', function($scope,$ionicActionSheet, $ionicModal, Loader, Data, Notification){
+    .controller('OrdersCtrl', ['$scope','$ionicActionSheet','$ionicModal','Loader','Data','Toast', function($scope,$ionicActionSheet, $ionicModal, Loader, Data, Toast){
          if (Data.orders != null) {
          $scope.orders = Data.orders;
          } else {
@@ -1058,7 +1089,8 @@ angular.module('ionicApp', ['ionic'])
                  console.log(data);
                  $scope.orders = data;
                  Data.orders = data;
-                 Notification.alert('successfully loaded orders', function(){return true},'Orders Loaded', 'OK');
+                 Toast.showLongTop('Orders Loaded  Successfully.');
+
              });
          }
 
@@ -1112,8 +1144,9 @@ angular.module('ionicApp', ['ionic'])
             Loader.show();
             Data.deleteOrder($scope.order.Id).success(function(data, status){
                 Loader.hide();
-                if(status == 200) {console.log('DELETED')
+                if(status == 200) {console.log('DELETED');
                     $scope.modal.hide();
+                    Toast.showLongTop('Order Was Deleted  Successfully.');
                     $scope.orders = $scope.orders.filter(function(item){
                         return item !== $scope.order;
                     });
@@ -1194,7 +1227,7 @@ angular.module('ionicApp', ['ionic'])
         };
     }])
 
-    .controller('CultivatedProductCtrl', ['$scope', 'Data','Loader', function($scope, Data, Loader){
+    .controller('CultivatedProductCtrl', ['$scope', 'Data','Loader','Toast', function($scope, Data, Loader, Toast){
 
         if(Data.commodities == null){
             Loader.show();
@@ -1238,13 +1271,16 @@ angular.module('ionicApp', ['ionic'])
             }
             crop.Comm = crop.Name;
             delete crop.Id;
-            Data.addCultivatedProds(crop).success(function(data){
+            Data.addCultivatedProds(crop).success(function(data, status){
                 Loader.hide();
                 console.log(data);
-                if(data != "null"){
+                if(status == 200){
+                    Toast.showLongTop('Product Was Added To Your List');
                     crop.Id = data;
                     $scope.cultivatedProducts.push(crop);
+                    return;
                 }
+                Toast.showLongTop('Could Not Add Product');
             });
         }
 
@@ -1255,6 +1291,8 @@ angular.module('ionicApp', ['ionic'])
                 console.log(data);
                 if(data == "true"){
                     $scope.cultivatedProducts.splice(index, 1);
+                    Toast.showLongTop('Product Removed  Successfully.');
+
                 }
             })
         }
@@ -1445,8 +1483,8 @@ angular.module('ionicApp', ['ionic'])
     }
 })
 
-    .controller('CamCtrl', ['$scope', '$location',
-        function($scope, $location) {
+    .controller('CamCtrl', ['$scope', '$state','Toast','Data',
+        function($scope, $state, Toast, Data) {
 
             // init variables
             $scope.data = {};
@@ -1454,7 +1492,27 @@ angular.module('ionicApp', ['ionic'])
             var pictureSource;   // picture source
             var destinationType; // sets the format of returned value
             var url;
+            if (Data.postingProduct != null) {
+                $scope.products = Data.postingProduct;
+            }else{
+                $scope.product = {};
+            }
 
+            if(Data.commodities == null){
+                Data.getCommodities().success(function(data){
+                    $scope.commodities = data;
+                    Data.commodities = data;
+                    console.log(data);
+                })
+
+            }else{
+                $scope.commodities = Data.commodities;
+            }
+
+            $scope.cancel = function(){
+                Data.postedProducts = null;
+                $state.go('account.produce-posted')
+            };
             // on DeviceReady check if already logged in (in our case CODE saved)
             ionic.Platform.ready(function() {
                 //console.log("ready get camera types");
@@ -1538,8 +1596,10 @@ angular.module('ionicApp', ['ionic'])
                 //console.log("new imp: prepare upload now");
                 var ft = new FileTransfer();
                 ft.upload($scope.mypicture, encodeURI('http://www.gidifarm.com/gidifarm-api/sproducts'), uploadSuccess, uploadError, options);
-                function uploadSuccess(r) {
-                    // handle success like a message to the user
+                function uploadSuccess(data) {
+                    Data.success = true;
+                    $scope.product = data ;
+                    Data.postedProducts.push($scope.product);
                 }
                 function uploadError(error) {
                     //console.log("upload error source " + error.source);
