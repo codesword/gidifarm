@@ -1582,9 +1582,15 @@ angular.module('ionicApp', ['ionic'])
                     return;
                 }
                 navigator.camera.getPicture(
-                    function (imageURI) {
+                    function (imageUrl) {
                         //console.log("got camera success ", imageURI);
-                        $scope.mypicture = imageURI;
+                        //if (imageUrl.substring(0,21)=="content://com.android") {
+                        if(imageUrl.indexOf('content://') != -1 && imageUrl.indexOf("%3A") != -1){
+                            //"PlainFileUrl = content://com.android.providers.media.documents/document/image%3A14",
+                            photo_split=imageUrl.split("%3A");
+                            imageUrl="content://media/external/images/media/"+photo_split[1];
+                        }
+                        $scope.mypicture = imageUrl;
                        // $scope.show(imageURI);
                     },
                     function (err) {
