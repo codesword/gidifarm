@@ -358,13 +358,19 @@ angular.module('ionicApp', ['ionic'])
 
     .factory('Toast', function() {
         // Trigger the loading indicator
+        ionic.Platform.ready(function() {
+        if(window.plugins.toast)return window.plugins.toast;
+            return;
+        });
 
-        return window.plugins.toast;
     })
 
     .factory('SocialShare', function() {
         // Trigger the loading indicator
-        return window.plugins.socialsharing;
+        ionic.Platform.ready(function() {
+            if(!window.plugins.socialsharing) return;
+            return window.plugins.socialsharing;
+        });
     })
 
     .factory('Notification', function ($q, $window, PhoneGap) {
@@ -1492,6 +1498,7 @@ angular.module('ionicApp', ['ionic'])
             var pictureSource;   // picture source
             var destinationType; // sets the format of returned value
             var url;
+          //  $scope.mypicture = http
             if (Data.postingProduct != null) {
                 $scope.products = Data.postingProduct;
             }else{
