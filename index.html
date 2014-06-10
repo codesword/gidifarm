@@ -264,7 +264,7 @@
                         </div>
                         <div class="tile tile-item tile-team">
                             <a class="ascensorLink ascensorLink4 tile-nav" href="#/market-perf">
-                                <h5 class="h5 home-text">Market Performance</h5>
+                                <h5 class="h5 home-text">Market Perf</h5>
                                 <i class="icon ion-stats-bars fa-4x"></i>
                             </a>
                         </div>
@@ -603,9 +603,16 @@
                 <a href="#/account/new-produce" class="button button-positive button-block">Add New Produce</a>
             </div>
             <div class="list">
-                <a ng-repeat="prod in products" class="item item-text-wrap" href="">
+               <!-- <a ng-repeat="prod in products" class="item item-text-wrap" href="">
                     <span>{{ prod.Name }} @ {{ prod.Price | nairacurrency }} | {{ prod.Measure }}</span>
                     <span class="badge badge-assertive">{{ prod.PostedDate }}</span>
+                </a>-->
+
+                <a ng-repeat="prod in products" class="item item-thumbnail-left" href="">
+                    <img src="http://www.gidifarm.com/gidifarm-api/SellProductImage/{{ prod.Id }}/thumbnail.jpg">
+                    <h2>{{ prod.Name }}</h2>
+                    <p>Price : {{ prod.Price | nairacurrency }} | {{ prod.Measure }}</p>
+                    <p>Posted Date : {{ prod.PostedDate }}</p>
                 </a>
             </div>
         </ion-content>
@@ -659,8 +666,8 @@
                         <option value="KG">KG</option>
                     </select>
                 </label>
-                <div class="item item-image">
-                    <img src="{{ mypicture }}" style="margin: 0 auto; height: auto; width: auto" >
+                <div class="item">
+                    <img src="{{ mypicture }}" style="margin: 0 auto; height: auto; width: 200px" >
                 </div>
                 <label class="item item-input">
                     <span class="input-label">Add Image</span>

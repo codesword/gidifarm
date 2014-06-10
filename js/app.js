@@ -226,7 +226,7 @@ angular.module('ionicApp', ['ionic'])
         var httpRequestInterceptor = function () {
             return {
                 request: function (config) {
-                    config.headers['Accept'] = 'application/json';
+                    config.headers['Accept'] = 'application/json, text/html';
                     config.headers['Content-Type'] = 'application/json';
                     return config;
                 }
@@ -704,9 +704,9 @@ angular.module('ionicApp', ['ionic'])
             Loader.show();
             Data.getNews().success(function(data){
                 Loader.hide();
-                window.plugins.toast.showLongTop('News Received Successfully.');
                 $scope.allNews = data;
                 Data.news = data;
+                window.plugins.toast.showLongTop('News Received Successfully.');
             });
         }
         else {
@@ -773,11 +773,11 @@ angular.module('ionicApp', ['ionic'])
         }
     }])
 
-    .controller('NewsDetailCtrl',['$scope', 'Data',  '$sce', 'Loader','Toast', function($scope, Data, $sce, Loader, Toast){
+    .controller('NewsDetailCtrl',['$scope', 'Data',  '$sce', function($scope, Data, $sce){
+
         $scope.news = Data.selectedNews;
-        $scope.template = null;
-        window.plugins.toast.showLongTop('Loading News');
-        $scope.template = $sce.trustAsHtml('http://gidifarm-admin.azurewebsites.net//gidifarm-api/newsTemplate/' + Data.selectedNews.Id + '.html');
+        window.plugins.toast.showLongTop('Loading News ...');
+        $scope.template = $sce.trustAsHtml('http://gidifarm-admin.azurewebsites.net/gidifarm-api/newsTemplate/' + Data.selectedNews.Id + '.html');
     }])
 
     .controller('ContactCtrl',['$scope', 'Data' , function($scope, Data){
@@ -1533,7 +1533,15 @@ angular.module('ionicApp', ['ionic'])
                 destinationType=navigator.camera.DestinationType.FILE_URI;
             });
 
-
+            $scope.show = function(data) {
+                var alertPopup = $ionicPopup.alert({
+                    title: 'Status ',
+                    content: angular.stringify(data)
+                });
+                alertPopup.then(function(res) {
+                    console.log('Thank you for not eating my delicious ice cream cone');
+                });
+            };
             // take picture
             $scope.takePicture = function() {
                 console.log("got camera button click");
@@ -1567,15 +1575,7 @@ angular.module('ionicApp', ['ionic'])
                     sourceType: getPictureSource,
                     encodingType: 0
                 };
-                $scope.show = function(data) {
-                    var alertPopup = $ionicPopup.alert({
-                        title: 'Status ',
-                        content: angular.stringify(data)
-                    });
-                    alertPopup.then(function(res) {
-                        console.log('Thank you for not eating my delicious ice cream cone');
-                    });
-                };
+
                 if (!navigator.camera)
                 {
                     // error handling
@@ -1585,7 +1585,7 @@ angular.module('ionicApp', ['ionic'])
                     function (imageURI) {
                         //console.log("got camera success ", imageURI);
                         $scope.mypicture = imageURI;
-                        $scope.show(imageURI);
+                       // $scope.show(imageURI);
                     },
                     function (err) {
                         //console.log("got camera error ", err);
