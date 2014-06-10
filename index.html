@@ -603,7 +603,7 @@
                 <a href="#/account/new-produce" class="button button-positive button-block">Add New Produce</a>
             </div>
             <div class="list">
-                <a ng-repeat="prod in products" class="item item-text-wrap" href="#">
+                <a ng-repeat="prod in products" class="item item-text-wrap" href="">
                     <span>{{ prod.Name }} @ {{ prod.Price | nairacurrency }} | {{ prod.Measure }}</span>
                     <span class="badge badge-assertive">{{ prod.PostedDate }}</span>
                 </a>
@@ -660,7 +660,7 @@
                     </select>
                 </label>
                 <div class="item item-image">
-                    <img ng-src="mypicture" style="margin: 0 auto; height: auto; width: auto" >
+                    <img src="{{ mypicture }}" style="margin: 0 auto; height: auto; width: auto" >
                 </div>
                 <label class="item item-input">
                     <span class="input-label">Add Image</span>

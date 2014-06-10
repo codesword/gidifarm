@@ -358,7 +358,7 @@ angular.module('ionicApp', ['ionic'])
 
     .factory('Toast', function() {
         // Trigger the loading indicator
-        window.plugins = {};
+
         return window.plugins.toast;
     })
 
@@ -1022,9 +1022,9 @@ angular.module('ionicApp', ['ionic'])
                     Toast.showLongTop('No Product To Display');
                     return;
                 }
-                Toast.showLongTop('Posted Products Loaded  Successfully.');
                 $scope.products = data;
                 Data.postedProducts = data;
+                Toast.showLongTop('Posted Products Loaded  Successfully.');
             });
         }
 
@@ -1483,8 +1483,8 @@ angular.module('ionicApp', ['ionic'])
     }
 })
 
-    .controller('CamCtrl', ['$scope', '$state','Toast','Data',
-        function($scope, $state, Toast, Data) {
+    .controller('CamCtrl', ['$scope', '$state','Toast','Data','$ionicPopup',
+        function($scope, $state, Toast, Data, $ionicPopup) {
 
             // init variables
             $scope.data = {};
@@ -1592,13 +1592,22 @@ angular.module('ionicApp', ['ionic'])
                 options.fileName=$scope.mypicture.substr($scope.mypicture.lastIndexOf('/')+1);
                 options.mimeType="image/jpeg";
                 options.params = prod;
-
+                $scope.show = function(data) {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Status ',
+                        content: angular.toJSON(data)
+                    });
+                    alertPopup.then(function(res) {
+                        console.log('Thank you for not eating my delicious ice cream cone');
+                    });
+                };
                 //console.log("new imp: prepare upload now");
                 var ft = new FileTransfer();
                 ft.upload($scope.mypicture, encodeURI('http://www.gidifarm.com/gidifarm-api/sproducts'), uploadSuccess, uploadError, options);
                 function uploadSuccess(data) {
                     Data.success = true;
                     $scope.product = data ;
+                    $scope.show(data);
                     Data.postedProducts.push($scope.product);
                 }
                 function uploadError(error) {
