@@ -23,11 +23,22 @@ angular.module('ionicApp', ['ionic'])
                 abstract: true,
                 templateUrl: "tabs.html"
             })
+
             .state('home', {
                 url: "/home",
-                        templateUrl: "home.html",
-                        controller: 'HomeCtrl'
+                abstract: true,
+                templateUrl: "home-menu.html",
+                controller: 'HomeCtrl'
 
+            })
+
+            .state('home.front', {
+                url: "/front",
+                views: {
+                    'menuContent': {
+                        templateUrl: "home.html"
+                    }
+                }
             })
 
             .state('account', {
@@ -778,6 +789,9 @@ angular.module('ionicApp', ['ionic'])
         $scope.news = Data.selectedNews;
         window.plugins.toast.showLongTop('Loading News ...');
         $scope.template = $sce.trustAsHtml('http://gidifarm-admin.azurewebsites.net/gidifarm-api/newsTemplate/' + Data.selectedNews.Id + '.html');
+        $scope.share = function(){
+            
+        }
     }])
 
     .controller('ContactCtrl',['$scope', 'Data' , function($scope, Data){
