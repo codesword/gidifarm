@@ -448,7 +448,7 @@
       <file leaf-file-name="config.xml" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/config.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="27" column="60" selection-start="1026" selection-end="1026" vertical-scroll-proportion="0.4239351" vertical-offset="250" max-vertical-offset="1785">
+            <state line="48" column="58" selection-start="3595" selection-end="3595" vertical-scroll-proportion="0.326572" vertical-offset="655" max-vertical-offset="1768">
               <folding />
             </state>
           </provider>
@@ -6808,7 +6808,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/config.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="60" selection-start="1026" selection-end="1026" vertical-scroll-proportion="0.4239351" vertical-offset="250" max-vertical-offset="1785">
+        <state line="48" column="58" selection-start="3595" selection-end="3595" vertical-scroll-proportion="0.326572" vertical-offset="655" max-vertical-offset="1768">
           <folding />
         </state>
       </provider>
