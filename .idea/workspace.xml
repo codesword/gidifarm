@@ -448,8 +448,10 @@
       <file leaf-file-name="config.xml" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/config.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="48" column="58" selection-start="3595" selection-end="3595" vertical-scroll-proportion="0.326572" vertical-offset="655" max-vertical-offset="1768">
-              <folding />
+            <state line="59" column="58" selection-start="4087" selection-end="4087" vertical-scroll-proportion="-0.5131846" vertical-offset="1256" max-vertical-offset="1768">
+              <folding>
+                <marker date="1403880287305" expanded="true" signature="4101:4314" placeholder="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -6808,8 +6810,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/config.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="48" column="58" selection-start="3595" selection-end="3595" vertical-scroll-proportion="0.326572" vertical-offset="655" max-vertical-offset="1768">
-          <folding />
+        <state line="59" column="58" selection-start="4087" selection-end="4087" vertical-scroll-proportion="-0.5131846" vertical-offset="1256" max-vertical-offset="1768">
+          <folding>
+            <marker date="1403880287305" expanded="true" signature="4101:4314" placeholder="..." />
+          </folding>
         </state>
       </provider>
     </entry>
